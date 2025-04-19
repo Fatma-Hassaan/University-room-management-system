@@ -32,9 +32,6 @@ namespace Project.Pages.CleaningStaff
                 return Page();
             }
 
-            // TODO: Save your supplies-request (Supplies + ExpectedDeliveryTime)
-            // e.g. _db.SuppliesRequests.Add(...); _db.SaveChanges();
-
             TempData["SuccessMessage"] = "Your supplies request has been submitted.";
             return RedirectToPage();
         }
