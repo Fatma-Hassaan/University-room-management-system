@@ -1,0 +1,62 @@
+﻿@page
+@model Project.Pages.RoomServicesTeam.Cleaning_RequestsModel
+@{
+ViewData["CustomNavbar"] = "RoomSearch"; // Flag that a custom navbar is provided
+}
+<!-- Main Content Section -->
+<div class="container mt-5">
+    <h3 class="mb-4">Cleaning Requests</h3>
+
+    <!-- Table to display requests -->
+    <table class="table table-bordered">
+        <thead class="table-success">
+            <tr>
+                <th>Requests</th>
+                <th>Room ID</th>
+                <th>Time of Request</th>
+                <th>Condition</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Request 1</td>
+                <td>F004</td>
+                <td>12:00</td>
+                <th>Done</th>
+            </tr>
+            <tr>
+                <td>Request 2</td>
+                <td>S004</td>
+                <td>04:00</td>
+                <th>Done</th>
+            </tr>
+            <tr>
+                <td>Request 3</td>
+                <td>S013 d</td>
+                <td>11:00</td>
+                <th>Pending</th>
+            </tr>
+            <tr>
+                <td>Request 4</td>
+                <td>S010 e</td>
+                <td>13:00</td>
+                <th>Pending</th>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Checking Progress Section -->
+    <div class="mt-4">
+        <h5>New Request</h5>
+        <div class="d-flex align-items-center">
+            <label for="roomSelect" class="me-2">Room</label>
+            <select id="roomSelect" class="form-select w-25">
+                <option value="F004">F004</option>
+                <option value="S004">S004</option>
+            </select>
+            <button class="btn btn-primary ms-3">Request</button>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\DB Project\\Code\\Project\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|e:\\db project\\code\\project\\project\\pages\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|solutionrelative:project\\pages\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "E:\\DB Project\\Code\\Project\\Project\\Pages\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "Project\\Pages\\Shared\\_Layout.cshtml",
+              "ToolTip": "E:\\DB Project\\Code\\Project\\Project\\Pages\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "Project\\Pages\\Shared\\_Layout.cshtml",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABMAAABsAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-18T14:22:30.293Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
