@@ -1,0 +1,173 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\DB Project\\Code\\new\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|e:\\db project\\code\\new\\project\\pages\\ta\\report.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|solutionrelative:project\\pages\\ta\\report.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|e:\\db project\\code\\new\\project\\pages\\ta\\report.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|solutionrelative:project\\pages\\ta\\report.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|e:\\db project\\code\\new\\project\\pages\\professor\\roombooking.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|solutionrelative:project\\pages\\professor\\roombooking.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|e:\\db project\\code\\new\\project\\pages\\professor\\roombooking.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|solutionrelative:project\\pages\\professor\\roombooking.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|e:\\db project\\code\\new\\project\\pages\\professor\\report.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|solutionrelative:project\\pages\\professor\\report.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|e:\\db project\\code\\new\\project\\pages\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|solutionrelative:project\\pages\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|e:\\db project\\code\\new\\project\\pages\\professor\\report.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|solutionrelative:project\\pages\\professor\\report.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|e:\\db project\\code\\new\\project\\pages\\professor\\myrooms.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|solutionrelative:project\\pages\\professor\\myrooms.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|e:\\db project\\code\\new\\project\\pages\\professor\\myrooms.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{AA5C8AEB-89DB-403F-8B6A-2A5B84220457}|Project\\Project.csproj|solutionrelative:project\\pages\\professor\\myrooms.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Report.cshtml",
+              "DocumentMoniker": "E:\\DB Project\\Code\\new\\Project\\Pages\\TA\\Report.cshtml",
+              "RelativeDocumentMoniker": "Project\\Pages\\TA\\Report.cshtml",
+              "ToolTip": "E:\\DB Project\\Code\\new\\Project\\Pages\\TA\\Report.cshtml",
+              "RelativeToolTip": "Project\\Pages\\TA\\Report.cshtml",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABQAAABLAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-20T11:30:10.465Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Report.cshtml.cs",
+              "DocumentMoniker": "E:\\DB Project\\Code\\new\\Project\\Pages\\TA\\Report.cshtml.cs",
+              "RelativeDocumentMoniker": "Project\\Pages\\TA\\Report.cshtml.cs",
+              "ToolTip": "E:\\DB Project\\Code\\new\\Project\\Pages\\TA\\Report.cshtml.cs",
+              "RelativeToolTip": "Project\\Pages\\TA\\Report.cshtml.cs",
+              "ViewState": "AQIAABAAAAAAAAAAAAAQwB0AAAAFAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-20T11:29:49.222Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "RoomBooking.cshtml.cs",
+              "DocumentMoniker": "E:\\DB Project\\Code\\new\\Project\\Pages\\Professor\\RoomBooking.cshtml.cs",
+              "RelativeDocumentMoniker": "Project\\Pages\\Professor\\RoomBooking.cshtml.cs",
+              "ToolTip": "E:\\DB Project\\Code\\new\\Project\\Pages\\Professor\\RoomBooking.cshtml.cs",
+              "RelativeToolTip": "Project\\Pages\\Professor\\RoomBooking.cshtml.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABwAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-20T10:50:54.938Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "RoomBooking.cshtml",
+              "DocumentMoniker": "E:\\DB Project\\Code\\new\\Project\\Pages\\Professor\\RoomBooking.cshtml",
+              "RelativeDocumentMoniker": "Project\\Pages\\Professor\\RoomBooking.cshtml",
+              "ToolTip": "E:\\DB Project\\Code\\new\\Project\\Pages\\Professor\\RoomBooking.cshtml",
+              "RelativeToolTip": "Project\\Pages\\Professor\\RoomBooking.cshtml",
+              "ViewState": "AQIAAAYAAAAAAAAAAAAvwBoAAAASAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-20T10:50:49.172Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Report.cshtml",
+              "DocumentMoniker": "E:\\DB Project\\Code\\new\\Project\\Pages\\Professor\\Report.cshtml",
+              "RelativeDocumentMoniker": "Project\\Pages\\Professor\\Report.cshtml",
+              "ToolTip": "E:\\DB Project\\Code\\new\\Project\\Pages\\Professor\\Report.cshtml",
+              "RelativeToolTip": "Project\\Pages\\Professor\\Report.cshtml",
+              "ViewState": "AQIAADAAAAAAAAAAAAAAAEUAAAAdAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-20T10:46:35.697Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Report.cshtml.cs",
+              "DocumentMoniker": "E:\\DB Project\\Code\\new\\Project\\Pages\\Professor\\Report.cshtml.cs",
+              "RelativeDocumentMoniker": "Project\\Pages\\Professor\\Report.cshtml.cs",
+              "ToolTip": "E:\\DB Project\\Code\\new\\Project\\Pages\\Professor\\Report.cshtml.cs",
+              "RelativeToolTip": "Project\\Pages\\Professor\\Report.cshtml.cs",
+              "ViewState": "AQIAABsAAAAAAAAAAAAuwDgAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-20T10:46:07.117Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "MyRooms.cshtml.cs",
+              "DocumentMoniker": "E:\\DB Project\\Code\\new\\Project\\Pages\\Professor\\MyRooms.cshtml.cs",
+              "RelativeDocumentMoniker": "Project\\Pages\\Professor\\MyRooms.cshtml.cs",
+              "ToolTip": "E:\\DB Project\\Code\\new\\Project\\Pages\\Professor\\MyRooms.cshtml.cs",
+              "RelativeToolTip": "Project\\Pages\\Professor\\MyRooms.cshtml.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAABDAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-20T10:42:03.717Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "MyRooms.cshtml",
+              "DocumentMoniker": "E:\\DB Project\\Code\\new\\Project\\Pages\\Professor\\MyRooms.cshtml",
+              "RelativeDocumentMoniker": "Project\\Pages\\Professor\\MyRooms.cshtml",
+              "ToolTip": "E:\\DB Project\\Code\\new\\Project\\Pages\\Professor\\MyRooms.cshtml",
+              "RelativeToolTip": "Project\\Pages\\Professor\\MyRooms.cshtml",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAEAAAAZAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-20T10:41:43.226Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "E:\\DB Project\\Code\\new\\Project\\Pages\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "Project\\Pages\\Shared\\_Layout.cshtml",
+              "ToolTip": "E:\\DB Project\\Code\\new\\Project\\Pages\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "Project\\Pages\\Shared\\_Layout.cshtml",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAtAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-18T14:22:30.293Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
