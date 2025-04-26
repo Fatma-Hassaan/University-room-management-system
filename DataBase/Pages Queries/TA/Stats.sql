@@ -1,6 +1,6 @@
 
 SELECT Quota
-FROM   Student
+FROM   [User]
 WHERE  ID = @TA_ID;
 
 
