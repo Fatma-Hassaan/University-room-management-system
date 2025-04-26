@@ -1,7 +1,7 @@
 
 SELECT Quota
 FROM   TA
-WHERE  ID = @TaID;
+WHERE  ID = @Student_ID;
 
 
 DECLARE @RID            INT            =  ,
@@ -20,6 +20,6 @@ VALUES(@UserID,'Pending',CAST(GETDATE() AS date), CAST(GETDATE() AS time), 'Addi
 SET @RID = SCOPE_IDENTITY();
 
 
-INSERT INTO AdditionalQuotaRequest (ID, RoomID, NumOfExtraHours)
-VALUES (@RID, @RoomID, @ExtraHours);
+INSERT INTO AdditionalQuotaRequest (ID, NumOfExtraHours)
+VALUES (@RID, @ExtraHours);
 
