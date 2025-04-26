@@ -222,9 +222,7 @@ IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='AdditionalQuotaRequest' AND 
 Begin
 	CREATE TABLE AdditionalQuotaRequest (
 		ID INT,
-		RoomID VARCHAR(50) Not Null,
 		NumOfExtraHours INT Not Null,
-		FOREIGN KEY (RoomID) REFERENCES Room(ID),
 		PRIMARY KEY (ID),
 		FOREIGN KEY (ID) REFERENCES RequestOrReport(RID) ON DELETE CASCADE
 );
