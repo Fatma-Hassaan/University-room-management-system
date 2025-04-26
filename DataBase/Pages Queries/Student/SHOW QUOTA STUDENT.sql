@@ -1,3 +1,3 @@
 SELECT Quota
-FROM   Student
+FROM   TA
 WHERE  ID = @StudentID;
