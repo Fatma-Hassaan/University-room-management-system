@@ -1,7 +1,7 @@
 
 SELECT Quota
 FROM   Student
-WHERE  ID = @StudentID;
+WHERE  ID = @TA_ID;
 
 
 DECLARE @RID            INT            =  ,
