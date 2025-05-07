@@ -1,8 +1,8 @@
-INSERT INTO [User] (UserID, Password, Name, Email, UserType) VALUES
+INSERT INTO [User] (UserID, [Password], [Name], Email, UserType) VALUES
 (1001, 'pass1', 'John Doe', 'john@uni.edu', 'Student'), (1002, 'pass2', 'Alice Smith', 'alice@uni.edu', 'TA'), (1003, 'pass3', 'Prof. Ahmed', 'ahmed@uni.edu', 'Professor'),
 (1004, 'pass4', 'Maria Garcia', 'maria@uni.edu', 'Registrar'), (1005, 'pass5', 'Emma Wilson', 'emma@uni.edu', 'RoomServicesMember'), (1006, 'pass6', 'Liam Brown', 'liam@uni.edu', 'CleaningStaffMember'),
 (1007, 'pass7', 'Sophia Lee', 'sophia@uni.edu', 'Student'), (1008, 'pass8', 'Noah Clark', 'noah@uni.edu', 'TA'), (1009, 'pass9', 'Olivia Martinez', 'olivia@uni.edu', 'Professor'),
-(1010, 'pass10', 'James Davis', 'james@uni.edu', 'Student'), (1011, 'pass11', 'Admin1', 'admin1@uni.edu', 'Admin'), (1012, 'pass12', 'Admin2', 'admin2@uni.edu', 'Admin'),
+(1010, 'pass10', 'James Davis', 'james@uni.edu', 'Student'), (1011, 'pass11', 'Emily Chen', 'echen@uni.edu', 'Student'),(1012, 'pass12', 'Michael Rodriguez', 'mrodriguez@uni.edu', 'Professor'),
 (1013, 'pass13', 'Ethan Anderson', 'ethan@uni.edu', 'Student'), (1014, 'pass14', 'Ava White', 'ava@uni.edu', 'Student'), (1015, 'pass15', 'Michael Johnson', 'michael@uni.edu', 'Student'),
 (1016, 'pass16', 'Isabella Thompson', 'isabella@uni.edu', 'Student'), (1017, 'pass17', 'William Harris', 'william@uni.edu', 'TA'), (1018, 'pass18', 'Mia Martin', 'mia@uni.edu', 'TA'),
 (1019, 'pass19', 'Benjamin Taylor', 'benjamin@uni.edu', 'Professor'), (1020, 'pass20', 'Charlotte Wilson', 'charlotte@uni.edu', 'Professor'), (1021, 'pass21', 'Daniel Moore', 'daniel@uni.edu', 'Registrar'),
@@ -17,26 +17,7 @@ INSERT INTO [User] (UserID, Password, Name, Email, UserType) VALUES
 (1046, 'pass46', 'Layla Morgan', 'layla@uni.edu', 'TA'), (1047, 'pass47', 'Christopher Bell', 'christopher@uni.edu', 'Professor'), (1048, 'pass48', 'Nora Murphy', 'nora@uni.edu', 'Professor'),
 (1049, 'pass49', 'Ryan Rivera', 'ryan@uni.edu', 'Registrar'), (1050, 'pass50', 'Hannah Cooper', 'hannah@uni.edu', 'Registrar');
 
-INSERT INTO Student (ID, Quota) VALUES
-(1001, 3), (1007, 3), (1010, 3), (1013, 3), (1014, 3), (1015, 3), (1016, 3), (1027, 3), (1028, 3), (1029, 3), (1030, 3), (1041, 3), (1042, 3), (1043, 3), (1044, 3);
-
-INSERT INTO TA (ID, OfficeRoom, Quota) VALUES
-(1002, 'A-101', 20), (1008, 'B-202', 20), (1017, 'E-102', 20), (1018, 'F-203', 20), (1031, 'G-304', 20), (1032, 'H-405', 20), (1045, 'I-506', 20), (1046, 'J-607', 20);
-
-INSERT INTO Professor (ID, OfficeRoom) VALUES
-(1003, 'C-301'), (1009, 'D-401'), (1019, 'K-701'), (1020, 'L-801'), (1033, 'M-901'), (1034, 'N-1001'), (1047, 'O-1101'), (1048, 'P-1201');
-
-INSERT INTO Registrar (ID) VALUES
-(1021), (1022), (1035), (1036), (1049), (1050);
-
-INSERT INTO RoomServicesMember (ID) VALUES
-(1023), (1024), (1037), (1038);
-
-INSERT INTO CleaningStaffMember (ID) VALUES
-(1025), (1026), (1039), (1040);
-
-
-INSERT INTO Room (ID, Building, [Floor], [Zone], Number, Capacity, AvailabilityStatus) VALUES
+INSERT INTO Room (ID, Building, [Floor], [Zone], Number, Capacity, AvailabilityStatus, DailyCleaningStatus) VALUES
 ('AB-013-A', 'Academic Building', 0, 'A', '13', 30, 'Available', 'Pending'),
 ('AB-101-B', 'Academic Building', 1, 'B', '01', 50, 'Available', 'Pending'),
 ('AB-202-C', 'Academic Building', 2, 'C', '02', 20, 'Closed', 'Pending'),
@@ -61,6 +42,25 @@ INSERT INTO Room (ID, Building, [Floor], [Zone], Number, Capacity, AvailabilityS
 ('NB-106-B', 'Nano Building', 1, 'B', '06', 45, 'Available', 'Pending'),
 ('NB-207-C', 'Nano Building', 2, 'C', '07', 30, 'Closed', 'Pending'),
 ('NB-307-D', 'Nano Building', 3, 'D', '07', 50, 'Available', 'Pending');
+
+INSERT INTO Student (ID, Quota) VALUES
+(1001, 3), (1007, 3), (1010, 3), (1011, 3), (1013, 3), (1014, 3), (1015, 3), (1016, 3), (1027, 3), (1028, 3), (1029, 3), (1030, 3), (1041, 3), (1042, 3), (1043, 3), (1044, 3);
+
+INSERT INTO TA (ID, OfficeRoom, Quota) VALUES
+(1002, 'AB-013-A', 20), (1008, 'AB-101-B', 20), (1017, 'AB-202-C', 20), (1018, 'AB-303-D', 20), (1031, 'AB-014-E', 20), (1032, 'AB-102-A', 20), (1045, 'AB-203-B', 20), (1046, 'AB-304-C', 20);
+
+INSERT INTO Professor (ID, OfficeRoom) VALUES
+(1003, 'AB-015-D'), (1009, 'HB-016-E'), (1012, 'NB-307-D'), (1019, 'HB-103-A'), (1020, 'HB-204-B'), (1033, 'HB-305-C'), (1034, 'HB-017-D'), (1047, 'HB-104-E'), (1048, 'HB-205-A');
+
+INSERT INTO Registrar (ID) VALUES
+(1021), (1022), (1035), (1036), (1049), (1050);
+
+INSERT INTO RoomServicesMember (ID) VALUES
+(1023), (1024), (1037), (1038);
+
+INSERT INTO CleaningStaffMember (ID) VALUES
+(1025), (1026), (1039), (1040);
+
 
 INSERT INTO Course (Code, [Name], ProfessorID, LectureRoom, LectureDay, LectureHour, LectureDuration, TutorialRoom, TutorialDay, TutorialHour, TutorialDuration) VALUES
 ('CIE101', 'Introduction to Infrastructure', 1003, 'AB-101-B', 'Monday', '10:00', 120, 'AB-102-A', 'Wednesday', '14:00', 90),
@@ -92,10 +92,10 @@ INSERT INTO Course (Code, [Name], ProfessorID, LectureRoom, LectureDay, LectureH
 
 
 INSERT INTO Course_Student (Student_ID, Course_Code) VALUES
-(1001, 'CIE101'), (1001, 'MATH202'), (1001, 'PHY101'), (1007, 'MATH202'), (1007, 'CS101'), (1007, 'EE202'), (1010, 'CHE201'), (1010, 'BIO103'), (1010, 'ENV101'), (1013, 'CIE102'),
-(1013, 'MATH203'), (1013, 'ARCH201'), (1014, 'PHY101'), (1014, 'CS101'), (1014, 'MECH203'), (1015, 'EE202'), (1015, 'MATH301'), (1015, 'CS202'), (1016, 'BIO103'), (1016, 'CHEM102'),
-(1016, 'ENV201'), (1027, 'ARCH201'), (1027, 'CIE201'), (1027, 'MECH301'), (1028, 'CS301'), (1028, 'EE401'), (1028, 'MATH301'),  (1029, 'BIO202'), (1029, 'ARCH301'), (1029, 'ENV201'),
-(1030, 'CS401'), (1030, 'EE501'), (1030, 'PHY202'), (1041, 'CIE101'), (1041, 'MATH202'), (1042, 'CHE201'), (1042, 'BIO103'), (1043, 'EE202'), (1043, 'CS101');
+(1001, 'CIE101'), (1001, 'MATH202'), (1001, 'PHY101'), (1007, 'MATH202'), (1007, 'CS101'), (1007, 'EE202'), (1010, 'CHE201'), (1010, 'BIO103'), (1010, 'ENV101'), (1011, 'EE501'),
+(1011, 'CS401'), (1013, 'CIE102'), (1013, 'MATH203'), (1013, 'ARCH201'), (1014, 'PHY101'), (1014, 'CS101'), (1014, 'MECH203'), (1015, 'EE202'), (1015, 'MATH301'), (1015, 'CS202'),
+(1016, 'BIO103'), (1016, 'CHEM102'), (1016, 'ENV201'), (1027, 'ARCH201'), (1027, 'CIE201'), (1027, 'MECH301'), (1028, 'CS301'), (1028, 'EE401'), (1028, 'MATH301'),  (1029, 'BIO202'),
+(1029, 'ARCH301'), (1029, 'ENV201'), (1030, 'CS401'), (1030, 'EE501'), (1030, 'PHY202'), (1041, 'CIE101'), (1041, 'MATH202'), (1042, 'CHE201'), (1042, 'BIO103'), (1043, 'EE202'), (1043, 'CS101');
 
 INSERT INTO Course_TA (TA_ID, Course_Code) VALUES
 (1002, 'CIE101'), (1002, 'MATH202'), (1002, 'PHY101'), (1008, 'CS101'), (1008, 'EE202'), (1008, 'BIO103'), (1017, 'CHE201'), (1017, 'ARCH201'), (1017, 'ENV101'), (1018, 'MECH203'),
@@ -105,7 +105,7 @@ INSERT INTO JTA (Student_ID, Course_Code) VALUES
 (1001, 'CIE101'), (1001, 'MATH202'), (1007, 'CS101'), (1007, 'EE202'), (1010, 'CHE201'), (1013, 'MATH203'),
 (1014, 'PHY101'), (1015, 'EE202'), (1027, 'ARCH201'), (1028, 'CS301'), (1041, 'CIE101'), (1043, 'CS101');
 
-INSERT INTO RequestOrReport (RID, UserID, Condition, DayofR, HourofR, RType) VALUES
+INSERT INTO RequestOrReport (RID, UserID, Condition, DayofR, HourofR, DayofHandling, HourofHandling, RType) VALUES
 -- ClinicBookingRequest (10) - Only by JTAs
 (1, 1001, 'Approved', '2023-09-10', '09:00', '2023-09-11', '10:00', 'ClinicBookingRequest'), (2, 1007, 'Pending', '2023-09-11', '10:30', NULL, NULL, 'ClinicBookingRequest'),
 (3, 1010, 'Approved', '2023-09-12', '11:00', '2023-09-12', '14:00', 'ClinicBookingRequest'), (4, 1013, 'Declined', '2023-09-13', '13:00', '2023-09-14', '09:00', 'ClinicBookingRequest'),
