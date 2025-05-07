@@ -168,7 +168,7 @@ Begin
 		HourofR TIME Not Null,
 		DayofHandling Date NULL,
 		HourofHandling TIME Null,
-		RType VARCHAR(20) NOT NULL CHECK (RType IN ('ClinicBookingRequest','RoomBooking', 'CleaningRequest', 'SuppliesRequest','RoomChangeRequest','AdditionalQuotaRequest','Report')),
+		RType VARCHAR(40) NOT NULL CHECK (RType IN ('ClinicBookingRequest','RoomBooking', 'CleaningRequest', 'SuppliesRequest','RoomChangeRequest','AdditionalQuotaRequest','Report')),
 		PRIMARY KEY (RID)
 );
 END
