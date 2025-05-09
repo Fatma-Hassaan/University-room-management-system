@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using Microsoft.Data.SqlClient;
@@ -359,8 +360,227 @@ namespace Project.Models
             }
             return result;
         }
-    }
+        public void UpdateCourse(string Code, string Name, int PID, string LRoom, string LDay, TimeSpan LHour, int LDuration, string TRoom, string TDay, TimeSpan THour, int TDuration)
+        {
+            string query = "UPDATE Course\r\nSET [Name] = @Name,\r\n    ProfessorID = @PID,\r\n    LectureRoom = @LRoom,\r\n    LectureDay = @LDay,\r\n    LectureHour = @LHour,\r\n    LectureDuration = @LDuration,\r\n    TutorialRoom = @TRoom,\r\n    TutorialDay = @TDay,\r\n    TutorialHour = @THour,\r\n    TutorialDuration = @TDuration\r\nWHERE Code = @Code;";
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@Code", Code);
+            cmd.Parameters.AddWithValue("@Name", Name);
+            cmd.Parameters.AddWithValue("@PID", PID);
+            cmd.Parameters.AddWithValue("@LRoom", LRoom);
+            cmd.Parameters.AddWithValue("@LDay", LDay);
+            cmd.Parameters.AddWithValue("@LHour", LHour);
+            cmd.Parameters.AddWithValue("@LDuration", LDuration);
+            cmd.Parameters.AddWithValue("@TRoom", TRoom);
+            cmd.Parameters.AddWithValue("@TDay", TDay);
+            cmd.Parameters.AddWithValue("@THour", THour);
+            cmd.Parameters.AddWithValue("@TDuration", TDuration);
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
 
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+        public DataTable GetMyBookings(int userID)
+        {
+            DataTable dt = new DataTable();
+            string query = @"
+                SELECT 
+                    b.BookingID, 
+                    r.RoomName, 
+                    b.StartTime, 
+                    b.EndTime, 
+                    b.Status, 
+                    b.Purpose 
+                FROM Bookings b
+                INNER JOIN Rooms r ON b.RoomID = r.RoomID
+                WHERE b.UserID = @UserID
+                ORDER BY b.StartTime DESC";
+
+            using (SqlCommand cmd = new SqlCommand(query, con))
+            {
+                cmd.Parameters.AddWithValue("@UserID", userID);
+                try
+                {
+                    con.Open();
+                    dt.Load(cmd.ExecuteReader());
+                }
+                catch { /* Handle error */ }
+                finally { con.Close(); }
+            }
+            return dt;
+        }
+
+    
+        public bool IsRoomAvailable(int roomID, DateTime startTime, DateTime endTime)
+        {
+            bool isAvailable = true;
+            string query = @"
+                SELECT COUNT(*) 
+                FROM Bookings 
+                WHERE RoomID = @RoomID
+                AND (
+                    (StartTime <= @StartTime AND EndTime >= @StartTime) OR
+                    (StartTime <= @EndTime AND EndTime >= @EndTime) OR
+                    (StartTime >= @StartTime AND EndTime <= @EndTime)
+                )
+                AND Status NOT IN ('Canceled', 'Rejected')";
+
+            using (SqlCommand cmd = new SqlCommand(query, con))
+            {
+                cmd.Parameters.AddWithValue("@RoomID", roomID);
+                cmd.Parameters.AddWithValue("@StartTime", startTime);
+                cmd.Parameters.AddWithValue("@EndTime", endTime);
+                
+                try
+                {
+                    con.Open();
+                    int conflictCount = (int)cmd.ExecuteScalar();
+                    isAvailable = conflictCount == 0;
+                }
+                catch { /* Handle error */ }
+                finally { con.Close(); }
+            }
+            return isAvailable;
+        }
+
+        public void CreateBooking(int userID, int roomID, DateTime startTime, DateTime endTime, string purpose)
+        {
+            // Auto-approve for professors
+            string userType = GetUserTypeByID(userID);
+            string status = userType.Equals("Professor", StringComparison.OrdinalIgnoreCase) 
+                            ? "Approved" 
+                            : "Pending";
+
+            string query = @"
+                INSERT INTO Bookings (
+                    UserID, 
+                    RoomID, 
+                    StartTime, 
+                    EndTime, 
+                    Purpose, 
+                    Status
+                ) VALUES (
+                    @UserID, 
+                    @RoomID, 
+                    @StartTime, 
+                    @EndTime, 
+                    @Purpose, 
+                    @Status
+                )";
+
+            using (SqlCommand cmd = new SqlCommand(query, con))
+            {
+                cmd.Parameters.AddWithValue("@UserID", userID);
+                cmd.Parameters.AddWithValue("@RoomID", roomID);
+                cmd.Parameters.AddWithValue("@StartTime", startTime);
+                cmd.Parameters.AddWithValue("@EndTime", endTime);
+                cmd.Parameters.AddWithValue("@Purpose", purpose);
+                cmd.Parameters.AddWithValue("@Status", status);
+
+                try
+                {
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+                catch { /* Handle error */ }
+                finally { con.Close(); }
+            }
+        }
+
+        public DataTable GetRoomUtilizationReport(DateTime startDate, DateTime endDate)
+        {
+            DataTable dt = new DataTable();
+            string query = @"
+                SELECT 
+                    r.RoomName,
+                    COUNT(b.BookingID) AS TotalBookings,
+                    AVG(DATEDIFF(HOUR, b.StartTime, b.EndTime)) AS AvgHours
+                FROM Rooms r
+                LEFT JOIN Bookings b ON r.RoomID = b.RoomID
+                WHERE b.StartTime BETWEEN @StartDate AND @EndDate
+                GROUP BY r.RoomName";
+
+            using (SqlCommand cmd = new SqlCommand(query, con))
+            {
+                cmd.Parameters.AddWithValue("@StartDate", startDate);
+                cmd.Parameters.AddWithValue("@EndDate", endDate);
+                try
+                {
+                    con.Open();
+                    dt.Load(cmd.ExecuteReader());
+                }
+                catch { /* Handle error */ }
+                finally { con.Close(); }
+            }
+            return dt;
+        }
+
+        public DataTable GetBookingConflicts()
+        {
+            DataTable dt = new DataTable();
+            string query = @"
+                SELECT 
+                    b.BookingID,
+                    r.RoomName,
+                    u.Name AS BookedBy,
+                    b.StartTime,
+                    b.EndTime,
+                    b.Status
+                FROM Bookings b
+                JOIN Rooms r ON b.RoomID = r.RoomID
+                JOIN Users u ON b.UserID = u.UserID
+                WHERE b.Status = 'Pending' 
+                   OR EXISTS (
+                       SELECT 1 
+                       FROM Bookings b2 
+                       WHERE b2.RoomID = b.RoomID
+                       AND b2.BookingID <> b.BookingID
+                       AND b2.StartTime < b.EndTime
+                       AND b2.EndTime > b.StartTime
+                   )";
+
+            using (SqlCommand cmd = new SqlCommand(query, con))
+            {
+                try
+                {
+                    con.Open();
+                    dt.Load(cmd.ExecuteReader());
+                }
+                catch { /* Handle error */ }
+                finally { con.Close(); }
+            }
+            return dt;
+        }
+
+        private string GetUserTypeByID(int userID)
+        {
+            string userType = "";
+            string query = "SELECT UserType FROM Users WHERE UserID = @UserID";
+            
+            using (SqlCommand cmd = new SqlCommand(query, con))
+            {
+                cmd.Parameters.AddWithValue("@UserID", userID);
+                try
+                {
+                    con.Open();
+                    object result = cmd.ExecuteScalar();
+                    if (result != null) userType = result.ToString();
+                }
+                catch { /* Handle error */ }
+                finally { con.Close(); }
+            }
+            return userType;
+        }
+    }
     public class CourseDetailsResult
     {
         public DataTable CourseInfo { get; set; }
