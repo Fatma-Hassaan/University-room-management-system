@@ -1,10 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Project.Models;
 
 namespace Project.Pages.Registrar
 {
     public class AddCourseModel : PageModel
     {
+        public DB db { get; set; }
+        public AddCourseModel(DB db)
+        {
+            this.db = db;
+        }
         [BindProperty]
         public CourseInputModel Input { get; set; }
 
@@ -27,8 +33,6 @@ namespace Project.Pages.Registrar
                 return Page();
             }
 
-            // Process the form data (save to database, etc.)
-            // Redirect to prevent duplicate submissions
             return RedirectToPage();
         }
 

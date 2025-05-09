@@ -1,11 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Project.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace Project.Pages.TA
 {
     public class StatsModel : PageModel
     {
+        public DB db { get; set; }
+        public StatsModel(DB db)
+        {
+            this.db = db;
+        }
+
         [BindProperty]
         public int RemainingMonthlyQuota { get; set; }
 

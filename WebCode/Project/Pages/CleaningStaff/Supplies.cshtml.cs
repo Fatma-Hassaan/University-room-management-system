@@ -1,11 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Project.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace Project.Pages.CleaningStaff
 {
     public class SuppliesModel : PageModel
     {
+        public DB db { get; set; }
+        public SuppliesModel(DB db)
+        {
+            this.db = db;
+        }
         [BindProperty, Required(ErrorMessage = "Please specify what supplies you need.")]
         public string Supplies { get; set; }
 

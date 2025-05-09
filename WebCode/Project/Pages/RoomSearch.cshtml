@@ -3,101 +3,108 @@
 @{
     ViewData["Title"] = "Room Search";
 }
+<div class="container text-center col-md-3">
+    <label for="searchType" class="btn btn-primary w-100 py-2 mb-3" style="background-color:#3a5169; cursor:default;">
+        Search Type
+    </label>    
+    <select id="searchType" name="SearchType" class="form-select" onchange="toggleSearchFields()">
+        <option value="">-- Choose --</option>
+        <option value="ByCourse">By Course / Staff / Type</option>
+        <option value="ByLocation">By Building / Floor / Zone</option>
+    </select>
+</div>
 <div class="container mt-4">
     <div class="card mb-4">
         <div class="card-body">
             <form method="get" class="row g-3">
-                <div class="col-md-2">
-                    <label asp-for="Input.CourseCode" class="form-label">Course Code</label>
-                    <input asp-for="Input.CourseCode" class="form-control" placeholder="e.g., SPC101">
+                <input type="hidden" name="SearchType" id="formSearchType" value="@Model.SearchType" />
+                <div class="col-md-2 search-by-course">
+                    <label asp-for="CourseCode" class="form-label">Course Code</label>
+                    <input asp-for="CourseCode" class="form-control" placeholder="e.g., SPC101">
                 </div>
-                <div class="col-md-2">
-                    <label asp-for="Input.StaffOffice" class="form-label">Staff Office</label>
-                    <input asp-for="Input.StaffOffice" class="form-control" placeholder="e.g., Dr. Ahmed">
+                <div class="col-md-2 search-by-course">
+                    <label asp-for="StaffOffice" class="form-label">Staff Office</label>
+                    <input asp-for="StaffOffice" class="form-control" placeholder="e.g., Dr. Ahmed">
                 </div>
-                <div class="col-md-2">
-                    <label asp-for="Input.Building" class="form-label">Building</label>
-                    <select asp-for="Input.Building" class="form-select">
+
+                <div class="col-md-2 search-by-course">
+                    <label asp-for="RoomType" class="form-label">Type</label>
+                    <select asp-for="RoomType" class="form-select">
                         <option value="">All</option>
-                        <option>Nano</option>
-                        <option>Helmy</option>
-                        <option>Main</option>
+                        <option value="Lecture">Lecture</option>
+                        <option value="Tutorial">Tutorial</option>
+                        <option value="Office">Office</option>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <label asp-for="Input.Floor" class="form-label">Floor</label>
-                    <select asp-for="Input.Floor" class="form-select">
+                <div class="col-md-2 search-by-location">
+                    <label asp-for="Building" class="form-label">Building</label>
+                    <select asp-for="Building" class="form-select">
                         <option value="">All</option>
-                        <option>Ground</option>
-                        <option>First</option>
-                        <option>Second</option>
+                        <option value="Academic Building">Academic Building</option>
+                        <option value="Nano Building">Nano Building</option>
+                        <option value="Helmy Building">Helmy Building</option>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <label asp-for="Input.Zone" class="form-label">Zone</label>
-                    <select asp-for="Input.Zone" class="form-select">
+                <div class="col-md-2 search-by-location">
+                    <label asp-for="Floor" class="form-label">Floor</label>
+                    <select asp-for="Floor" class="form-select">
                         <option value="">All</option>
-                        <option>A</option>
-                        <option>B</option>
-                        <option>C</option>
+                        <option value=0>0</option>
+                        <option value=1>1</option>
+                        <option value=2>2</option>
+                        <option value=3>3</option>
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <label asp-for="Input.RoomType" class="form-label">Type</label>
-                    <select asp-for="Input.RoomType" class="form-select">
+                <div class="col-md-2 search-by-location">
+                    <label asp-for="Zone" class="form-label">Zone</label>
+                    <select asp-for="Zone" class="form-select">
                         <option value="">All</option>
-                        <option>Lab</option>
-                        <option>Office</option>
-                        <option>Classroom</option>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                        <option value="E">E</option>
                     </select>
-                </div>
+                </div>                
                 <div class="col-12">
                     <button type="submit" class="btn btn-primary w-100 py-2" style="background-color:#2c3e50;">Search Rooms</button>
                 </div>
             </form>
         </div>
     </div>
-
-    <!-- Search Results -->
-    @if (Model.SearchResults?.Any() == true)
+     
+    @if (Model.DT.Rows.Count>0)
     {
         <div class="table-responsive">
             <table class="table table-bordered table-striped">
                 <thead class="thead-dark">
                     <tr>
-                        <th>Room Number</th>
-                        <th>Course Code</th>
-                        <th>Staff Office</th>
+                        <th>ID</th>
                         <th>Building</th>
                         <th>Floor</th>
                         <th>Zone</th>
-                        <th>Type</th>
-                        <th>Status</th>
+                        <th>Number</th>
+                        <th>Capacity</th>
+                        <th>Avalibility</th>
+                        <th>Daily Cleaning</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var room in Model.SearchResults)
+                    @for (int i = 1; i < Model.DT.Rows.Count; i++)
                     {
                         <tr>
-                            <td>@room.RoomNumber</td>
-                            <td>@room.CourseCode</td>
-                            <td>@room.StaffOffice</td>
-                            <td>@room.Building</td>
-                            <td>@room.Floor</td>
-                            <td>@room.Zone</td>
-                            <td>@room.RoomType</td>
-                            <td>
-                                <span class="badge @(room.IsAvailable ? "bg-success" : "bg-danger")">
-                                    @(room.IsAvailable ? "Available" : "Occupied")
-                                </span>
-                            </td>
+                        @for (int j = 0; j < Model.DT.Columns.Count; j++)
+                        {
+                         <td>@Model.DT.Rows[i][j]</td>   
+                        }
                         </tr>
+
                     }
                 </tbody>
             </table>
         </div>
     }
-    else if (Model.Searched)
+    else
     {
         <div class="alert alert-info">No rooms found matching your criteria.</div>
     }
@@ -113,3 +120,23 @@
         padding: 0.35em 0.65em;
     }
 </style>
+
+<script>
+    function toggleSearchFields() {
+        const searchType = document.getElementById("searchType").value;
+        const byCourse = document.querySelectorAll(".search-by-course input, .search-by-course select");
+        const byLocation = document.querySelectorAll(".search-by-location input, .search-by-location select");
+
+        if (searchType === "ByCourse") {
+            byCourse.forEach(e => e.disabled = false);
+            byLocation.forEach(e => e.disabled = true);
+        } else if (searchType === "ByLocation") {
+            byCourse.forEach(e => e.disabled = true);
+            byLocation.forEach(e => e.disabled = false);
+        } else {
+            byCourse.forEach(e => e.disabled = true);
+            byLocation.forEach(e => e.disabled = true);
+        }
+    }
+    window.onload = toggleSearchFields;
+</script>

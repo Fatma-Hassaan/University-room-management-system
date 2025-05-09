@@ -1,10 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Project.Models;
 
 namespace Project.Pages.Student
 {
     public class My_RoomsModel : PageModel
     {
+        public DB db { get; set; }
+        public My_RoomsModel(DB db)
+        {
+            this.db = db;
+        }
         public List<CourseInfo> JTACourses { get; set; } = new();
         public List<CourseInfo> EnrolledCourses { get; set; } = new();
         public IActionResult OnGet()

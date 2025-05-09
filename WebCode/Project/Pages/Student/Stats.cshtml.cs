@@ -1,11 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Project.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace Project.Pages.Student
 {
     public class StatsModel : PageModel
     {
+        public DB db { get; set; }
+        public StatsModel(DB db)
+        {
+            this.db = db;
+        }
         public int RemainingMonthlyQuota { get; set; }
         [BindProperty,
            Required(ErrorMessage = "Please enter how many hours you need.")]

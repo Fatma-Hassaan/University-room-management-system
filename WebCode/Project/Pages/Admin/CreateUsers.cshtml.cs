@@ -1,12 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Project.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace Project.Pages.Admin
 {
     public class Create_UsersModel : PageModel
     {
+        public DB db { get; set; }
+        public Create_UsersModel(DB db)
+        {
+            this.db = db;
+        }
         [BindProperty, Required]
         public string UserName { get; set; }
 
