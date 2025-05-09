@@ -1,11 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Project.Models;
 using Project.Pages.TA;
 
 namespace Project.Pages.Professor
 {
     public class My_RoomsModel : PageModel
     {
+        public DB db { get; set; }
+        public My_RoomsModel(DB db)
+        {
+            this.db = db;
+        }
         public List<Course> Courses { get; set; }
         public List<RoomChangeRequest> ChangeRequests { get; set; }
         public IActionResult OnGet()

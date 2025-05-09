@@ -2,14 +2,29 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using Project.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace Project.Pages
 {
+    
     [BindProperties (SupportsGet=true)]
 
     public class LoginModel : PageModel
     {
 
+        public DB db { get; set; }
+        public int ID { get; set; }
+        public LoginModel(DB db)
+        {
+            this.db = db;
+        }
+
+        [TempData]
+        public string EmailErrorMessage { get; set; }
+        [TempData]
+        public string PasswordErrorMessage { get; set; }
+        public string UT { get; set; }
         [Required]
         [EmailAddress]
         public string Email { get; set; }
@@ -28,37 +43,27 @@ namespace Project.Pages
         }
 
         public IActionResult OnPost()
-        {   
-            if (Email.Contains("admin-"))
+        {
+            UT= db.GetUserType(Email);
+
+            if (string.IsNullOrEmpty(UT))
             {
-                HttpContext.Session.SetString("UserType", "Admin");
-            }
-            else if (Email.Contains("ta-"))
-            {
-                HttpContext.Session.SetString("UserType", "TA");
-            }
-            else if (Email.Contains("re-"))
-            {
-                HttpContext.Session.SetString("UserType", "Registrar");
-            }
-            else if (Email.Contains("cs-"))
-            {
-                HttpContext.Session.SetString("UserType", "CleaningStaff");
-            }
-            else if (Email.Contains("prof-"))
-            {
-                HttpContext.Session.SetString("UserType", "Professor");
-            }
-            else if (Email.Contains("rst-"))
-            {
-                HttpContext.Session.SetString("UserType", "RoomSevicesTeam");
-            }
-            else
-            {
-                HttpContext.Session.SetString("UserType", "Student");
+                EmailErrorMessage = "The email you entered doesn't exist in our system.";
+                return Page();
             }
 
+            ID = db.GetUserID(Email);
+
+            if (!db.CheckPassword(ID, Password))
+            {
+                PasswordErrorMessage = "The password is not correct.";
+                return Page();
+            }
+            HttpContext.Session.SetString("UserType", UT);
+
             return RedirectToPage("/Home");
+
+
             
         }
     }

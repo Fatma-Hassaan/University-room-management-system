@@ -1,3 +1,5 @@
+using Project.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 
@@ -6,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
+builder.Services.AddSingleton<DB>();
 
 var app = builder.Build();
 

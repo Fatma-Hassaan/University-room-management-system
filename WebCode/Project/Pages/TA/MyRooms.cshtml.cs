@@ -1,11 +1,17 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Project.Models;
 
 namespace Project.Pages.TA
 {
     public class MyRoomsModel : PageModel
     {
+        public DB db { get; set; }
+        public MyRoomsModel(DB db)
+        {
+            this.db = db;
+        }
         public List<Tutorial> TutorialRooms { get; set; }
         public List<RoomChangeRequest> PendingRequests { get; set; }
         public IActionResult OnGet()

@@ -1,11 +1,17 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Project.Models;
 
 namespace Project.Pages.Student
 {
     public class ReportModel : PageModel
     {
+        public DB db { get; set; }
+        public ReportModel(DB db)
+        {
+            this.db = db;
+        }
         [BindProperty]
         [Required]
         [Display(Name = "Room Code")]

@@ -168,7 +168,7 @@ Begin
 		HourofR TIME Not Null,
 		DayofHandling Date NULL,
 		HourofHandling TIME Null,
-		RType VARCHAR(20) NOT NULL CHECK (RType IN ('ClinicBookingRequest','RoomBooking', 'CleaningRequest', 'SuppliesRequest','RoomChangeRequest','AdditionalQuotaRequest','Report')),
+		RType VARCHAR(40) NOT NULL CHECK (RType IN ('ClinicBookingRequest','RoomBooking', 'CleaningRequest', 'SuppliesRequest','RoomChangeRequest','AdditionalQuotaRequest','Report')),
 		PRIMARY KEY (RID)
 );
 END
@@ -222,9 +222,8 @@ IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='AdditionalQuotaRequest' AND 
 Begin
 	CREATE TABLE AdditionalQuotaRequest (
 		ID INT,
-		RoomID VARCHAR(50) Not Null,
 		NumOfExtraHours INT Not Null,
-		FOREIGN KEY (RoomID) REFERENCES Room(ID),
+		Reason TEXT Not Null,
 		PRIMARY KEY (ID),
 		FOREIGN KEY (ID) REFERENCES RequestOrReport(RID) ON DELETE CASCADE
 );

@@ -1,10 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
- 
- namespace Project.Pages.Admin
+using Project.Models;
+
+namespace Project.Pages.Admin
 {
     public class StatsModel : PageModel
     {
+        public DB db { get; set; }
+        public StatsModel(DB db)
+        {
+            this.db = db;
+        }
         public int ProfessorsCount { get; private set; }
         public int TAsCount { get; private set; }
         public int StudentsCount { get; private set; }

@@ -1,10 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Project.Models;
 
 namespace Project.Pages.RoomServicesTeam
 {
     public class Rooms_ConditionModel : PageModel
     {
+        public DB db { get; set; }
+        public Rooms_ConditionModel(DB db)
+        {
+            this.db = db;
+        }
         public List<(string RoomId, string Condition)> RoomCondition { get; set; }
 
         [BindProperty]
