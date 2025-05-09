@@ -17,6 +17,9 @@ INSERT INTO [User] (UserID, [Password], [Name], Email, UserType) VALUES
 (1046, 'pass46', 'Layla Morgan', 'layla@uni.edu', 'TA'), (1047, 'pass47', 'Christopher Bell', 'christopher@uni.edu', 'Professor'), (1048, 'pass48', 'Nora Murphy', 'nora@uni.edu', 'Professor'),
 (1049, 'pass49', 'Ryan Rivera', 'ryan@uni.edu', 'Registrar'), (1050, 'pass50', 'Hannah Cooper', 'hannah@uni.edu', 'Registrar');
 
+INSERT INTO Student (ID, Quota) VALUES
+(1001, 3), (1007, 3), (1010, 3), (1011, 3), (1013, 3), (1014, 3), (1015, 3), (1016, 3), (1027, 3), (1028, 3), (1029, 3), (1030, 3), (1041, 3), (1042, 3), (1043, 3), (1044, 3);
+
 INSERT INTO Room (ID, Building, [Floor], [Zone], Number, Capacity, AvailabilityStatus, DailyCleaningStatus) VALUES
 ('AB-013-A', 'Academic Building', 0, 'A', '13', 30, 'Available', 'Pending'),
 ('AB-101-B', 'Academic Building', 1, 'B', '01', 50, 'Available', 'Pending'),
@@ -43,9 +46,6 @@ INSERT INTO Room (ID, Building, [Floor], [Zone], Number, Capacity, AvailabilityS
 ('NB-207-C', 'Nano Building', 2, 'C', '07', 30, 'Closed', 'Pending'),
 ('NB-307-D', 'Nano Building', 3, 'D', '07', 50, 'Available', 'Pending');
 
-INSERT INTO Student (ID, Quota) VALUES
-(1001, 3), (1007, 3), (1010, 3), (1011, 3), (1013, 3), (1014, 3), (1015, 3), (1016, 3), (1027, 3), (1028, 3), (1029, 3), (1030, 3), (1041, 3), (1042, 3), (1043, 3), (1044, 3);
-
 INSERT INTO TA (ID, OfficeRoom, Quota) VALUES
 (1002, 'AB-013-A', 20), (1008, 'AB-101-B', 20), (1017, 'AB-202-C', 20), (1018, 'AB-303-D', 20), (1031, 'AB-014-E', 20), (1032, 'AB-102-A', 20), (1045, 'AB-203-B', 20), (1046, 'AB-304-C', 20);
 
@@ -61,6 +61,8 @@ INSERT INTO RoomServicesMember (ID) VALUES
 INSERT INTO CleaningStaffMember (ID) VALUES
 (1025), (1026), (1039), (1040);
 
+INSERT INTO [Admin] (ID, [Password], [Name], Email) VALUES
+(1, 'admin1', 'Sarah Kamal', 'sarah.kamal@zewail.edu.eg'), (2, 'admin2', 'Omar Hany', 'omar.hany@zewail.edu.eg'), (3, 'admin3', 'Laila Nasser', 'laila.nasser@zewail.edu.eg');
 
 INSERT INTO Course (Code, [Name], ProfessorID, LectureRoom, LectureDay, LectureHour, LectureDuration, TutorialRoom, TutorialDay, TutorialHour, TutorialDuration) VALUES
 ('CIE101', 'Introduction to Infrastructure', 1003, 'AB-101-B', 'Monday', '10:00', 120, 'AB-102-A', 'Wednesday', '14:00', 90),
@@ -176,8 +178,9 @@ INSERT INTO RoomChangeRequest (ID, NewRoomID, CourseCode, LectureOrTutorial) VAL
 (41, 'AB-102-A', 'CIE101', 1), (42, 'HB-103-A', 'MATH202', 2), (43, 'NB-105-C', 'PHY101', 1), (44, 'AB-014-E', 'CHE201', 2), (45, 'HB-016-E', 'CS101', 1),
 (46, 'NB-106-B', 'EE202', 2), (47, 'AB-015-D', 'BIO103', 1), (48, 'HB-017-D', 'ARCH201', 2), (49, 'NB-018-B', 'ENV101', 1), (50, 'AB-101-B', 'MECH203', 2);
 
-INSERT INTO AdditionalQuotaRequest (ID, NumOfExtraHours) VALUES
-(51, 2), (52, 3), (53, 1), (54, 4), (55, 2), (56, 3), (57, 1), (58, 5), (59, 2), (60, 3);
+INSERT INTO AdditionalQuotaRequest (ID, NumOfExtraHours, Reason) VALUES
+(51, 2, 'Group study'), (52, 3, 'Research work'), (53, 1, 'Thesis writing'), (54, 4, 'Project development'), (55, 2, 'Exam preparation'), 
+(56, 3, 'Coursework'), (57, 1, 'Meeting with advisor'), (58, 5, 'Workshop preparation'), (59, 2, 'Faculty meeting'), (60, 3, 'Special lecture');
 
 INSERT INTO Report (ID, RoomID, Complaint) VALUES
 (61, 'AB-101-B', 'Broken projector in classroom'), (62, 'HB-204-B', 'Leaking ceiling during rain'), (63, 'NB-206-D', 'Air conditioning not working'), (64, 'AB-203-B', 'Damaged chairs need replacement'),

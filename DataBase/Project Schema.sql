@@ -223,6 +223,7 @@ Begin
 	CREATE TABLE AdditionalQuotaRequest (
 		ID INT,
 		NumOfExtraHours INT Not Null,
+		Reason TEXT Not Null,
 		PRIMARY KEY (ID),
 		FOREIGN KEY (ID) REFERENCES RequestOrReport(RID) ON DELETE CASCADE
 );
