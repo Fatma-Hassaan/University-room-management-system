@@ -22,7 +22,7 @@ namespace Project.Pages.RoomServicesTeam
                 return RedirectToPage("/Login");
             }
 
-            QuotaRequests = db.LoadQuotaRequests(); // make sure this is implemented
+            QuotaRequests = db.LoadQuotaRequests(); 
             return Page();
         }
 
@@ -33,7 +33,7 @@ namespace Project.Pages.RoomServicesTeam
                 return RedirectToPage("/Login");
             }
 
-            db.UpdateQuotaStatus(requestId, status); // implement this too
+            db.UpdateQuotaStatus(requestId, status); 
             return RedirectToPage();
         }
     }
