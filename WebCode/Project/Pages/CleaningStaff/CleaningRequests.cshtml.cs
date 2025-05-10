@@ -12,7 +12,7 @@ namespace Project.Pages.CleaningStaff
 
         public Cleaning_RequestsModel()
         {
-            db = new DB(); // Manually create instance since not using DI
+            db = new DB(); 
         }
 
         public IActionResult OnGet()
@@ -24,7 +24,7 @@ namespace Project.Pages.CleaningStaff
                 return RedirectToPage("/Login");
             }
 
-            // Otherwise, load the cleaning requests (real or mock)
+            // Otherwise, load the cleaning requests
             CleaningRequestsTable = db.LoadCleaningRequests();
 
             return Page();
