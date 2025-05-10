@@ -43,8 +43,8 @@ namespace Project.Pages.RoomServicesTeam
 
         private void LoadPageData()
         {
-            RequestsTable = db.LoadAllCleaningRequests(); // Fetch all cleaning requests
-            AvailableRooms = db.GetAvailableRoomIDs();    // Just a mock or real room list
+            RequestsTable = db.LoadAllCleaningRequests(); 
+            AvailableRooms = db.GetAvailableRoomIDs();    
         }
     }
 }
