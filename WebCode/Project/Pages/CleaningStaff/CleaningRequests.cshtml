@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model Project.Pages.CleaningStaff.Cleaning_RequestsModel
 @{
     ViewData["Title"] = "Cleaning Requests";
@@ -19,7 +19,7 @@ else
             <th>Room ID</th>
             <th>Condition</th>
             <th>Date</th>
-            <th>Time</th>
+            <th>Time</th> <!-- Make sure there's a column for Time -->
             <th>Requested By</th>
             <th>Action</th>
         </tr>
@@ -27,21 +27,22 @@ else
         <tbody>
         @foreach (System.Data.DataRow row in Model.CleaningRequestsTable.Rows)
         {
-            <tr>
-                <td>@row["ID"]</td>
-                <td>@row["RoomID"]</td>
-                <td>@row["Condition"]</td>
-                <td>@Convert.ToDateTime(row["RequestDate"]).ToShortDateString()</td>
-                <td>@Convert.ToDateTime(row["RequestTime"]).ToString("hh\\:mm")</td>
-                <td>@row["RequestorName"]</td>
-                <td>
-                    <form method="post" asp-page-handler="MarkAsDone">
-                        <input type="hidden" name="requestId" value="@row["ID"]" />
-                        <button type="submit" class="btn btn-success">Mark as Done</button>
-                    </form>
-                </td>
-            </tr>
+        <tr>
+            <td>@row["ID"]</td>
+            <td>@row["RoomID"]</td>
+            <td>@row["Condition"]</td>
+            <td>@Convert.ToDateTime(row["RequestDate"]).ToShortDateString()</td>
+            <td>@((TimeSpan)row["RequestTime"])</td>
+            <td>@row["RequestorName"]</td>
+            <td>
+                <form method="post" asp-page-handler="MarkAsDone">
+                    <input type="hidden" name="requestId" value="@row["ID"]" />
+                    <button type="submit" class="btn btn-success">Mark as Done</button>
+                </form>
+            </td>
+        </tr>
         }
+
         </tbody>
     </table>
 }
