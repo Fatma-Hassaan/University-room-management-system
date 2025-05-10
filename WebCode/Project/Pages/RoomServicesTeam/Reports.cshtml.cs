@@ -34,7 +34,7 @@ namespace Project.Pages.RoomServicesTeam
             }
 
             db.UpdateReportCondition(reportId, status);
-            return RedirectToPage(); // refresh after update
+            return RedirectToPage(); 
         }
     }
 }
