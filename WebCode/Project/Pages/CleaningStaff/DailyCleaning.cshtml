@@ -2,8 +2,8 @@
 @model Project.Pages.CleaningStaff.Daily_CleaningModel
 @{
     ViewData["Title"] = "DailyCleaning";
-
 }
+
 <!-- Main Content Section -->
 <div class="container mt-5">
     <h3 class="mb-4">Daily Cleaning</h3>
@@ -11,48 +11,42 @@
     <!-- Table to display room conditions -->
     <table class="table table-bordered">
         <thead class="table-success">
-            <tr>
-                <th>Room ID</th>
-                <th>Condition</th>
-            </tr>
+        <tr>
+            <th>Room ID</th>
+            <th>Condition</th>
+        </tr>
         </thead>
         <tbody>
+        @foreach (System.Data.DataRow row in Model.DailyStatuses.Rows)
+        {
             <tr>
-                <td>F004</td>
-                <td>Done</td>
+                <td>@row["RoomID"]</td>
+                <td>@row["Condition"]</td>
             </tr>
-            <tr>
-                <td>S004</td>
-                <td>Done</td>
-            </tr>
-            <tr>
-                <td>S013 d</td>
-                <td>In Progress</td>
-            </tr>
-            <tr>
-                <td>S010 e</td>
-                <td>Undone</td>
-            </tr>
+        }
         </tbody>
     </table>
 
     <!-- Room Condition Progress Section -->
-    <div class="mt-4">
+    <form method="post" class="mt-4">
         <h5>Checking Progress</h5>
         <div class="d-flex align-items-center">
-            <label for="roomSelect" class="me-2">Room</label>
-            <select id="roomSelect" class="form-select w-25">
-                <option value="F004">F004</option>
-                <option value="S004">S004</option>
+            <label asp-for="SelectedRoom" class="me-2">Room</label>
+            <select asp-for="SelectedRoom" class="form-select w-25">
+                @foreach (System.Data.DataRow row in Model.DailyStatuses.Rows)
+                {
+                    <option value="@row["RoomID"]">@row["RoomID"]</option>
+                }
             </select>
-            <label for="conditionSelect" class="ms-3 me-2">Condition</label>
-            <select id="conditionSelect" class="form-select w-25">
-                <option value="Undone">Undone</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Done">Done</option>
-            </select>
-            <button class="btn btn-primary ms-3">Set</button>
-        </div>
-    </div>
-</div>
 
+            <label asp-for="SelectedCondition" class="ms-3 me-2">Condition</label>
+            <select asp-for="SelectedCondition" class="form-select w-25">
+                <option>Undone</option>
+                <option>In Progress</option>
+                <option>Done</option>
+            </select>
+
+            <button type="submit" class="btn btn-primary ms-3">Set</button>
+        </div>
+    </form>
+</div>
