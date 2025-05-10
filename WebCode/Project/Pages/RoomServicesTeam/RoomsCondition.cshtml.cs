@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Project.Models;
+using System.Data;
 
 namespace Project.Pages.RoomServicesTeam
 {
@@ -11,15 +12,11 @@ namespace Project.Pages.RoomServicesTeam
         {
             this.db = db;
         }
-        public List<(string RoomId, string Condition)> RoomCondition { get; set; }
+
+        public DataTable RoomsTable { get; set; }
 
         [BindProperty]
         public string RoomId { get; set; }
-
-        [BindProperty]
-        public string NewCondition { get; set; }
-
-        public List<string> AvailableRooms { get; set; }
 
         public IActionResult OnGet()
         {
@@ -27,27 +24,14 @@ namespace Project.Pages.RoomServicesTeam
             {
                 return RedirectToPage("/Login");
             }
-            else
-            {
-                RoomCondition = new List<(string, string)>
-                {
-                ("F004", "Open"),
-                ("S004", "Close"),
-                ("S013 d", "Open"),
-                ("S010 e", "Open"),
-                };
 
-                AvailableRooms = RoomCondition.Select(r => r.RoomId).ToList();
-
-                return Page();
-            }
+            RoomsTable = db.LoadRoomConditions(); // This method should return a DataTable with RoomID & Condition columns
+            return Page();
         }
 
-
-        public IActionResult OnPost()
+        public IActionResult OnPostToggle()
         {
-            // Handle logic to update condition here
-            // e.g., Update DB: UpdateRoomCondition(RoomId, NewCondition);
+            db.ToggleRoomCondition(RoomId); // This method toggles Open/Close for the selected room
             return RedirectToPage();
         }
     }

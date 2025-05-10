@@ -1,62 +1,60 @@
 ﻿@page
-@model Project.Pages.RoomServicesTeam.Cleaning_RequestsModel
+@model Project.Pages.RoomServicesTeam.CleaningRequestsModel
 @{
-ViewData["CustomNavbar"] = "RoomSearch"; // Flag that a custom navbar is provided
+    ViewData["Title"] = "Cleaning Requests";
+    ViewData["CustomNavbar"] = "RoomSearch";
 }
-<!-- Main Content Section -->
+
 <div class="container mt-5">
     <h3 class="mb-4">Cleaning Requests</h3>
 
-    <!-- Table to display requests -->
+    <!-- Cleaning Request Table -->
     <table class="table table-bordered">
         <thead class="table-success">
-            <tr>
-                <th>Requests</th>
-                <th>Room ID</th>
-                <th>Time of Request</th>
-                <th>Condition</th>
-            </tr>
+        <tr>
+            <th>Request</th>
+            <th>Room ID</th>
+            <th>Time of Request</th>
+            <th>Condition</th>
+        </tr>
         </thead>
         <tbody>
+        @if (Model.RequestsTable.Rows.Count > 0)
+        {
+            int i = 1;
+            foreach (System.Data.DataRow row in Model.RequestsTable.Rows)
+            {
+                <tr>
+                    <td>Request @i</td>
+                    <td>@row["RoomID"]</td>
+                    <td>@Convert.ToDateTime(row["RequestTime"]).ToString("HH:mm")</td>
+                    <td>@row["Condition"]</td>
+                </tr>
+                i++;
+            }
+        }
+        else
+        {
             <tr>
-                <td>Request 1</td>
-                <td>F004</td>
-                <td>12:00</td>
-                <th>Done</th>
+                <td colspan="4" class="text-center">No cleaning requests found.</td>
             </tr>
-            <tr>
-                <td>Request 2</td>
-                <td>S004</td>
-                <td>04:00</td>
-                <th>Done</th>
-            </tr>
-            <tr>
-                <td>Request 3</td>
-                <td>S013 d</td>
-                <td>11:00</td>
-                <th>Pending</th>
-            </tr>
-            <tr>
-                <td>Request 4</td>
-                <td>S010 e</td>
-                <td>13:00</td>
-                <th>Pending</th>
-            </tr>
+        }
         </tbody>
     </table>
 
-    <!-- Checking Progress Section -->
-    <div class="mt-4">
-        <h5>New Request</h5>
-        <div class="d-flex align-items-center">
-            <label for="roomSelect" class="me-2">Room</label>
-            <select id="roomSelect" class="form-select w-25">
-                <option value="F004">F004</option>
-                <option value="S004">S004</option>
+    <!-- New Request Form -->
+    <form method="post" asp-page-handler="NewRequest">
+        <div class="mt-4 d-flex align-items-center">
+            <label for="RoomID" class="me-2">Room</label>
+            <select id="RoomID" name="RoomID" class="form-select w-25 me-3">
+                @foreach (var room in Model.AvailableRooms)
+                {
+                    <option value="@room">@room</option>
+                }
             </select>
-            <button class="btn btn-primary ms-3">Request</button>
+            <button type="submit" class="btn btn-primary">Request</button>
         </div>
-    </div>
+    </form>
 </div>
 
 

@@ -4,69 +4,53 @@
     ViewData["Title"] = "Quota Requests";
     ViewData["CustomNavbar"] = "RoomSearch";
 }
- 
- 
-<!-- Main Content -->
+
 <div class="container mt-5">
     <h3 class="mb-4">Quota Requests</h3>
- 
-    <!-- Quota Table -->
-    <table class="table table-bordered">
-        <thead class="table-success">
-            <tr>
-                <th>Request #</th>
-                <th>User ID</th>
-                <th>User Type</th>
-                <th>Number of Extra Hours</th>
-                <th>Reason</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Request 1</td>
-                <td>20202</td>
-                <td>Student</td>
-                <td>1</td>
-                <td>Needs to finish lab</td>
-            </tr>
-            <tr>
-                <td>Request 2</td>
-                <td>20200</td>
-                <td>JTA</td>
-                <td>3</td>
-                <td>Prepare session</td>
-            </tr>
-            <tr>
-                <td>Request 3</td>
-                <td>19150</td>
-                <td>TA</td>
-                <td>5</td>
-                <td>Review student work</td>
-            </tr>
-            <tr>
-                <td>Request 4</td>
-                <td>19151</td>
-                <td>Student</td>
-                <td>2</td>
-                <td>Exam study</td>
-            </tr>
-        </tbody>
-    </table>
- 
-    <!-- Approval Section -->
-    <div class="mt-4">
-        <h5>Checking Progress</h5>
-        <div class="d-flex align-items-center">
-            <label for="userSelect" class="me-2">User ID</label>
-            <select id="userSelect" class="form-select w-25">
-                <option value="20202">20202</option>
-                <option value="20200">20200</option>
-                <option value="19150">19150</option>
-                <option value="19151">19151</option>
-            </select>
-            <button class="btn btn-success ms-3">Approve</button>
-            <button class="btn btn-danger ms-2">Reject</button>
-        </div>
-    </div>
+
+    @if (Model.QuotaRequests.Rows.Count == 0)
+    {
+        <p>No quota extension requests found.</p>
+    }
+    else
+    {
+        <table class="table table-bordered">
+            <thead class="table-success">
+                <tr>
+                    <th>Request #</th>
+                    <th>User ID</th>
+                    <th>User Type</th>
+                    <th>Extra Hours</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (System.Data.DataRow row in Model.QuotaRequests.Rows)
+                {
+                    <tr>
+                        <td>@row["ID"]</td>
+                        <td>@row["UserID"]</td>
+                        <td>@row["UserType"]</td>
+                        <td>@row["ExtraHours"]</td>
+                        <td>@row["Reason"]</td>
+                        <td>@row["Status"]</td>
+                        <td>
+                            <form method="post" asp-page-handler="SetStatus" class="d-inline">
+                                <input type="hidden" name="requestId" value="@row["ID"]" />
+                                <input type="hidden" name="status" value="Approved" />
+                                <button class="btn btn-success btn-sm">Approve</button>
+                            </form>
+                            <form method="post" asp-page-handler="SetStatus" class="d-inline ms-1">
+                                <input type="hidden" name="requestId" value="@row["ID"]" />
+                                <input type="hidden" name="status" value="Rejected" />
+                                <button class="btn btn-danger btn-sm">Reject</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 </div>
- 

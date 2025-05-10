@@ -1,36 +1,38 @@
 ﻿@page
-@model Project.Pages.RoomServicesTeam.Daily_CleaningModel
+@model Project.Pages.CleaningStaff.Daily_CleaningModel
 @{
-    ViewData["Title"] = "DailyCleaning";
-
+    ViewData["Title"] = "Daily Cleaning";
+    ViewData["CustomNavbar"] = "RoomSearch";
 }
 
 <div class="container mt-5">
     <h3 class="mb-4">Daily Cleaning</h3>
+
+    <!-- Table to display room conditions -->
     <table class="table table-bordered">
         <thead class="table-success">
-            <tr>
-                <th>Room ID</th>
-                <th>Condition</th>
-            </tr>
+        <tr>
+            <th>Room ID</th>
+            <th>Condition</th>
+        </tr>
         </thead>
         <tbody>
+        @if (Model.RoomCleaningTable != null && Model.RoomCleaningTable.Rows.Count > 0)
+        {
+            foreach (System.Data.DataRow row in Model.RoomCleaningTable.Rows)
+            {
+                <tr>
+                    <td>@row["RoomID"]</td>
+                    <td>@row["Condition"]</td>
+                </tr>
+            }
+        }
+        else
+        {
             <tr>
-                <td>F004</td>
-                <td>Done</td>
+                <td colspan="2" class="text-center">No cleaning data found.</td>
             </tr>
-            <tr>
-                <td>S004</td>
-                <td>Done</td>
-            </tr>
-            <tr>
-                <td>S013 d</td>
-                <td>In Progress</td>
-            </tr>
-            <tr>
-                <td>S010 e</td>
-                <td>Undone</td>
-            </tr>
+        }
         </tbody>
     </table>
 </div>

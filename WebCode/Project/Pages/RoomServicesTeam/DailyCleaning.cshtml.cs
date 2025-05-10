@@ -1,26 +1,28 @@
+using System.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Project.Models;
 
-namespace Project.Pages.RoomServicesTeam
+public class Daily_CleaningModel : PageModel
 {
-    public class Daily_CleaningModel : PageModel
+    private readonly DB db;
+    [BindProperty]
+    public DataTable RoomCleaningTable { get; set; }
+
+    public Daily_CleaningModel(DB db)
     {
-        public DB db { get; set; }
-        public Daily_CleaningModel(DB db)
+        this.db = db;
+    }
+    
+
+    public IActionResult OnGet()
+    {
+        if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserType")))
         {
-            this.db = db;
+           return RedirectToPage("/Login");
         }
-        public IActionResult OnGet()
-        {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserType")))
-            {
-                return RedirectToPage("/Login");
-            }
-            else
-            {
-                return Page();
-            }
-        }
+
+        RoomCleaningTable = db.LoadRoomCleaningStatus();
+        return Page();
     }
 }
