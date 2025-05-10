@@ -24,15 +24,14 @@ namespace Project.Pages.CleaningStaff
 
         public Daily_CleaningModel()
         {
-            db = new DB(); // Manual instance for now
+            db = new DB(); 
         }
 
         public IActionResult OnGet()
         {
-            // Check if user is logged in
+        
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserType")))
             {
-                // If not logged in, redirect to login page
                 return RedirectToPage("/Login");
             }
             
