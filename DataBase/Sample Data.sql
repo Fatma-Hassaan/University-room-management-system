@@ -1,20 +1,20 @@
 INSERT INTO [User] (UserID, [Password], [Name], Email, UserType) VALUES
-(1001, 'pass1', 'John Doe', 'john@uni.edu', 'Student'), (1002, 'pass2', 'Alice Smith', 'alice@uni.edu', 'TA'), (1003, 'pass3', 'Prof. Ahmed', 'ahmed@uni.edu', 'Professor'),
+(1001, 'pass1', 'John Doe', 'john@uni.edu', 'Student'), (1002, 'pass2', 'Alice Smith', 'alice@uni.edu', 'TA'), (1003, 'pass3', 'Prof. Ahmed Mohamed', 'ahmed@uni.edu', 'Professor'),
 (1004, 'pass4', 'Maria Garcia', 'maria@uni.edu', 'Registrar'), (1005, 'pass5', 'Emma Wilson', 'emma@uni.edu', 'RoomServicesMember'), (1006, 'pass6', 'Liam Brown', 'liam@uni.edu', 'CleaningStaffMember'),
-(1007, 'pass7', 'Sophia Lee', 'sophia@uni.edu', 'Student'), (1008, 'pass8', 'Noah Clark', 'noah@uni.edu', 'TA'), (1009, 'pass9', 'Olivia Martinez', 'olivia@uni.edu', 'Professor'),
-(1010, 'pass10', 'James Davis', 'james@uni.edu', 'Student'), (1011, 'pass11', 'Emily Chen', 'echen@uni.edu', 'Student'),(1012, 'pass12', 'Michael Rodriguez', 'mrodriguez@uni.edu', 'Professor'),
+(1007, 'pass7', 'Sophia Lee', 'sophia@uni.edu', 'Student'), (1008, 'pass8', 'Noah Clark', 'noah@uni.edu', 'TA'), (1009, 'pass9', 'Prof. Olivia Martinez', 'olivia@uni.edu', 'Professor'),
+(1010, 'pass10', 'James Davis', 'james@uni.edu', 'Student'), (1011, 'pass11', 'Emily Chen', 'echen@uni.edu', 'Student'),(1012, 'pass12', 'Prof. Michael Rodriguez', 'mrodriguez@uni.edu', 'Professor'),
 (1013, 'pass13', 'Ethan Anderson', 'ethan@uni.edu', 'Student'), (1014, 'pass14', 'Ava White', 'ava@uni.edu', 'Student'), (1015, 'pass15', 'Michael Johnson', 'michael@uni.edu', 'Student'),
 (1016, 'pass16', 'Isabella Thompson', 'isabella@uni.edu', 'Student'), (1017, 'pass17', 'William Harris', 'william@uni.edu', 'TA'), (1018, 'pass18', 'Mia Martin', 'mia@uni.edu', 'TA'),
-(1019, 'pass19', 'Benjamin Taylor', 'benjamin@uni.edu', 'Professor'), (1020, 'pass20', 'Charlotte Wilson', 'charlotte@uni.edu', 'Professor'), (1021, 'pass21', 'Daniel Moore', 'daniel@uni.edu', 'Registrar'),
+(1019, 'pass19', 'Prof. Benjamin Taylor', 'benjamin@uni.edu', 'Professor'), (1020, 'pass20', 'Prof. Charlotte Wilson', 'charlotte@uni.edu', 'Professor'), (1021, 'pass21', 'Daniel Moore', 'daniel@uni.edu', 'Registrar'),
 (1022, 'pass22', 'Amelia Jackson', 'amelia@uni.edu', 'Registrar'), (1023, 'pass23', 'Lucas Lee', 'lucas@uni.edu', 'RoomServicesMember'), (1024, 'pass24', 'Harper Scott', 'harper@uni.edu', 'RoomServicesMember'),
 (1025, 'pass25', 'Henry Green', 'henry@uni.edu', 'CleaningStaffMember'), (1026, 'pass26', 'Evelyn Adams', 'evelyn@uni.edu', 'CleaningStaffMember'), (1027, 'pass27', 'Alexander Baker', 'alexander@uni.edu', 'Student'),
 (1028, 'pass28', 'Abigail Nelson', 'abigail@uni.edu', 'Student'), (1029, 'pass29', 'Sebastian Carter', 'sebastian@uni.edu', 'Student'), (1030, 'pass30', 'Emily Mitchell', 'emily@uni.edu', 'Student'),
-(1031, 'pass31', 'Jackson Perez', 'jackson@uni.edu', 'TA'), (1032, 'pass32', 'Madison Roberts', 'madison@uni.edu', 'TA'), (1033, 'pass33', 'Aiden Turner', 'aiden@uni.edu', 'Professor'),
-(1034, 'pass34', 'Scarlett Phillips', 'scarlett@uni.edu', 'Professor'), (1035, 'pass35', 'Samuel Campbell', 'samuel@uni.edu', 'Registrar'), (1036, 'pass36', 'Victoria Parker', 'victoria@uni.edu', 'Registrar'),
+(1031, 'pass31', 'Jackson Perez', 'jackson@uni.edu', 'TA'), (1032, 'pass32', 'Madison Roberts', 'madison@uni.edu', 'TA'), (1033, 'pass33', 'Prof. Aiden Turner', 'aiden@uni.edu', 'Professor'),
+(1034, 'pass34', 'Prof. Scarlett Phillips', 'scarlett@uni.edu', 'Professor'), (1035, 'pass35', 'Samuel Campbell', 'samuel@uni.edu', 'Registrar'), (1036, 'pass36', 'Victoria Parker', 'victoria@uni.edu', 'Registrar'),
 (1037, 'pass37', 'Joseph Evans', 'joseph@uni.edu', 'RoomServicesMember'), (1038, 'pass38', 'Luna Edwards', 'luna@uni.edu', 'RoomServicesMember'), (1039, 'pass39', 'David Collins', 'david@uni.edu', 'CleaningStaffMember'),
 (1040, 'pass40', 'Penelope Stewart', 'penelope@uni.edu', 'CleaningStaffMember'), (1041, 'pass41', 'Leo Sanchez', 'leo@uni.edu', 'Student'), (1042, 'pass42', 'Chloe Morris', 'chloe@uni.edu', 'Student'),
 (1043, 'pass43', 'Gabriel Rogers', 'gabriel@uni.edu', 'Student'), (1044, 'pass44', 'Zoey Reed', 'zoey@uni.edu', 'Student'), (1045, 'pass45', 'Julian Cook', 'julian@uni.edu', 'TA'),
-(1046, 'pass46', 'Layla Morgan', 'layla@uni.edu', 'TA'), (1047, 'pass47', 'Christopher Bell', 'christopher@uni.edu', 'Professor'), (1048, 'pass48', 'Nora Murphy', 'nora@uni.edu', 'Professor'),
+(1046, 'pass46', 'Layla Morgan', 'layla@uni.edu', 'TA'), (1047, 'pass47', 'Prof. Christopher Bell', 'christopher@uni.edu', 'Professor'), (1048, 'pass48', 'Prof. Nora Murphy', 'nora@uni.edu', 'Professor'),
 (1049, 'pass49', 'Ryan Rivera', 'ryan@uni.edu', 'Registrar'), (1050, 'pass50', 'Hannah Cooper', 'hannah@uni.edu', 'Registrar');
 
 INSERT INTO Student (ID, Quota) VALUES
