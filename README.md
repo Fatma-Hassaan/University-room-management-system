@@ -48,8 +48,8 @@
 
 ---
 
-## 👥 Team [[Your Team Number]]  
-**[[Course Name]]** • **[[University Name]]**  
+## 👥 Team [[4]]  
+**[[Database Management System]]** • **[[University of Science and Technology in Zewail City]]**  
 
 |        Name        |   ID          |         Email                            |    
 |--------------------|---------------|------------------------------------------|
