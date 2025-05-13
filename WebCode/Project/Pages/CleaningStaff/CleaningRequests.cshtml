@@ -1,48 +1,58 @@
 @page
-@model Project.Pages.CleaningStaff.Cleaning_RequestsModel
+@model Project.Pages.RoomServicesTeam.Cleaning_RequestModel
 @{
-    ViewData["Title"] = "Cleaning Requests";
+    ViewData["Title"] = "Submit Cleaning Request";
 }
 
-<h2>Cleaning Requests</h2>
+<h2>Submit a Cleaning Request</h2>
+
+<!-- Form to submit a new cleaning request -->
+<form method="post" asp-page-handler="SubmitCleaningRequest">
+    <div class="d-flex align-items-center mb-4">
+        <label class="me-2">Select Room:</label>
+        <select asp-for="SelectedRoomId" class="form-select w-25" required>
+            <option value="">-- Select Room --</option>
+            @foreach (var room in Model.RoomsList)
+            {
+                <option value="@room">@room</option>
+            }
+        </select>
+        <button type="submit" class="btn btn-primary ms-3">Request</button>
+    </div>
+</form>
+
+<!-- Table of all cleaning requests -->
+<h3>Cleaning Requests</h3>
 
 @if (Model.CleaningRequestsTable.Rows.Count == 0)
 {
-    <p>No pending or in-progress cleaning requests found.</p>
+    <p>No cleaning requests found.</p>
 }
 else
 {
     <table class="table table-bordered">
-        <thead>
+        <thead class="table-light">
         <tr>
             <th>Request ID</th>
             <th>Room ID</th>
             <th>Condition</th>
             <th>Date</th>
-            <th>Time</th> <!-- Make sure there's a column for Time -->
+            <th>Time</th>
             <th>Requested By</th>
-            <th>Action</th>
         </tr>
         </thead>
         <tbody>
         @foreach (System.Data.DataRow row in Model.CleaningRequestsTable.Rows)
         {
-        <tr>
-            <td>@row["ID"]</td>
-            <td>@row["RoomID"]</td>
-            <td>@row["Condition"]</td>
-            <td>@Convert.ToDateTime(row["RequestDate"]).ToShortDateString()</td>
-            <td>@((TimeSpan)row["RequestTime"])</td>
-            <td>@row["RequestorName"]</td>
-            <td>
-                <form method="post" asp-page-handler="MarkAsDone">
-                    <input type="hidden" name="requestId" value="@row["ID"]" />
-                    <button type="submit" class="btn btn-success">Mark as Done</button>
-                </form>
-            </td>
-        </tr>
+            <tr>
+                <td>@row["RID"]</td>
+                <td>@row["RoomID"]</td>
+                <td>@row["Condition"]</td>
+                <td>@Convert.ToDateTime(row["RequestDate"]).ToShortDateString()</td>
+                <td>@row["RequestTime"]</td>
+                <td>@row["RequestorName"]</td>
+            </tr>
         }
-
         </tbody>
     </table>
 }
