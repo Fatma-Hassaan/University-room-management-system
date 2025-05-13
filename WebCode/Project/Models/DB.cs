@@ -16,11 +16,10 @@ namespace Project.Models
         {
             con = new SqlConnection(ConnectionString);
         }
-        public DataTable LoadRoomConditions()
+         public DataTable LoadRoomAvailabilityStatuses()
         {
             DataTable dt = new DataTable();
-            string query = "SELECT RoomID, Condition FROM Room";
-
+            string query = "SELECT ID AS RoomID, AvailabilityStatus FROM Room";
             SqlCommand cmd = new SqlCommand(query, con);
 
             try
@@ -28,66 +27,35 @@ namespace Project.Models
                 con.Open();
                 dt.Load(cmd.ExecuteReader());
             }
-            catch (Exception ex)
-            {
-                // Log or handle as needed
-            }
             finally
             {
                 con.Close();
             }
-
             return dt;
         }
-        public void ToggleRoomCondition(string roomId)
+
+        public void ToggleRoomAvailability(string roomId)
         {
-            string currentCondition = "";
-            string selectQuery = "SELECT Condition FROM Room WHERE RoomID = @RoomID";
-            SqlCommand selectCmd = new SqlCommand(selectQuery, con);
-            selectCmd.Parameters.AddWithValue("@RoomID", roomId);
+            string selectQuery = "SELECT AvailabilityStatus FROM Room WHERE ID = @RoomID";
+            string currentStatus = "";
 
-            try
+            using (SqlCommand selectCmd = new SqlCommand(selectQuery, con))
             {
-                con.Open();
-                object result = selectCmd.ExecuteScalar();
-                if (result != null)
-                {
-                    currentCondition = result.ToString();
-                }
-            }
-            catch (Exception ex)
-            {
-                // Log or handle
-            }
-            finally
-            {
-                con.Close();
-            }
-
-            if (!string.IsNullOrEmpty(currentCondition))
-            {
-                string newCondition = currentCondition == "Open" ? "Close" : "Open";
-
-                string updateQuery = "UPDATE Room SET Condition = @Condition WHERE RoomID = @RoomID";
-                SqlCommand updateCmd = new SqlCommand(updateQuery, con);
-                updateCmd.Parameters.AddWithValue("@Condition", newCondition);
-                updateCmd.Parameters.AddWithValue("@RoomID", roomId);
-
+                selectCmd.Parameters.AddWithValue("@RoomID", roomId);
                 try
                 {
                     con.Open();
-                    updateCmd.ExecuteNonQuery();
-                }
-                catch (Exception ex)
-                {
-                    // Log or handle
+                    var result = selectCmd.ExecuteScalar();
+                    if (result != null)
+                    {
+                        currentStatus = result.ToString();
+                    }
                 }
                 finally
                 {
                     con.Close();
                 }
             }
-        }
 
        public DataTable LoadAllCleaningRequestsForRoomServices()
         {
@@ -265,6 +233,28 @@ namespace Project.Models
                 }
             }
         }
+           public List<string> GetAvailableRoomIDs()
+        {
+            var list = new List<string>();
+            string query = "SELECT ID FROM Room"; // Adjust if needed
+            SqlCommand cmd = new SqlCommand(query, con);
+            try
+            {
+                con.Open();
+                var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    list.Add(reader["ID"].ToString());
+                }
+                reader.Close();
+            }
+            finally
+            {
+                con.Close();
+            }
+            return list;
+        }
+
 
      
 
