@@ -16,11 +16,10 @@ namespace Project.Models
         {
             con = new SqlConnection(ConnectionString);
         }
-        public DataTable LoadRoomConditions()
+         public DataTable LoadRoomAvailabilityStatuses()
         {
             DataTable dt = new DataTable();
-            string query = "SELECT RoomID, Condition FROM Room";
-
+            string query = "SELECT ID AS RoomID, AvailabilityStatus FROM Room";
             SqlCommand cmd = new SqlCommand(query, con);
 
             try
@@ -28,66 +27,35 @@ namespace Project.Models
                 con.Open();
                 dt.Load(cmd.ExecuteReader());
             }
-            catch (Exception ex)
-            {
-                // Log or handle as needed
-            }
             finally
             {
                 con.Close();
             }
-
             return dt;
         }
-        public void ToggleRoomCondition(string roomId)
+
+        public void ToggleRoomAvailability(string roomId)
         {
-            string currentCondition = "";
-            string selectQuery = "SELECT Condition FROM Room WHERE RoomID = @RoomID";
-            SqlCommand selectCmd = new SqlCommand(selectQuery, con);
-            selectCmd.Parameters.AddWithValue("@RoomID", roomId);
+            string selectQuery = "SELECT AvailabilityStatus FROM Room WHERE ID = @RoomID";
+            string currentStatus = "";
 
-            try
+            using (SqlCommand selectCmd = new SqlCommand(selectQuery, con))
             {
-                con.Open();
-                object result = selectCmd.ExecuteScalar();
-                if (result != null)
-                {
-                    currentCondition = result.ToString();
-                }
-            }
-            catch (Exception ex)
-            {
-                // Log or handle
-            }
-            finally
-            {
-                con.Close();
-            }
-
-            if (!string.IsNullOrEmpty(currentCondition))
-            {
-                string newCondition = currentCondition == "Open" ? "Close" : "Open";
-
-                string updateQuery = "UPDATE Room SET Condition = @Condition WHERE RoomID = @RoomID";
-                SqlCommand updateCmd = new SqlCommand(updateQuery, con);
-                updateCmd.Parameters.AddWithValue("@Condition", newCondition);
-                updateCmd.Parameters.AddWithValue("@RoomID", roomId);
-
+                selectCmd.Parameters.AddWithValue("@RoomID", roomId);
                 try
                 {
                     con.Open();
-                    updateCmd.ExecuteNonQuery();
-                }
-                catch (Exception ex)
-                {
-                    // Log or handle
+                    var result = selectCmd.ExecuteScalar();
+                    if (result != null)
+                    {
+                        currentStatus = result.ToString();
+                    }
                 }
                 finally
                 {
                     con.Close();
                 }
             }
-        }
 
        public DataTable LoadAllCleaningRequestsForRoomServices()
         {
@@ -201,65 +169,141 @@ namespace Project.Models
             return dt;
         }
 
-        public DataTable LoadQuotaRequests()
+               public DataTable LoadQuotaRequests()
         {
             DataTable dt = new DataTable();
-            string query = "SELECT ID, UserID, UserType, ExtraHours, Reason, Status FROM QuotaRequest WHERE Status != 'Handled'";
+            string query = @"
+        SELECT 
+            aqr.ID,
+            rr.UserID,
+            u.UserType,
+            aqr.NumOfExtraHours AS ExtraHours,
+            aqr.Reason,
+            rr.Condition AS Status
+        FROM AdditionalQuotaRequest aqr
+        JOIN RequestOrReport rr ON aqr.ID = rr.RID
+        JOIN [User] u ON rr.UserID = u.UserID
+        WHERE rr.Condition = 'Pending' AND rr.RType = 'AdditionalQuotaRequest'
+        ORDER BY rr.DayofR DESC, rr.HourofR DESC;
+    ";
+
             SqlCommand cmd = new SqlCommand(query, con);
             try
             {
                 con.Open();
                 dt.Load(cmd.ExecuteReader());
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error loading quota requests: " + ex.Message);
+            }
             finally
             {
                 con.Close();
             }
+
             return dt;
         }
 
-        public void UpdateQuotaStatus(int requestId, string status)
+        public void UpdateQuotaStatus(int requestId, string newStatus)
         {
-            string query = "UPDATE QuotaRequest SET Status = @Status WHERE ID = @ID";
+            string query = @"
+        UPDATE RequestOrReport
+        SET Condition = @Status
+        WHERE RID = @RID AND RType = 'AdditionalQuotaRequest';
+    ";
+
+            using (SqlCommand cmd = new SqlCommand(query, con))
+            {
+                cmd.Parameters.AddWithValue("@Status", newStatus);
+                cmd.Parameters.AddWithValue("@RID", requestId);
+
+                try
+                {
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error updating quota status: " + ex.Message);
+                }
+                finally
+                {
+                    con.Close();
+                }
+            }
+        }
+           public List<string> GetAvailableRoomIDs()
+        {
+            var list = new List<string>();
+            string query = "SELECT ID FROM Room"; // Adjust if needed
             SqlCommand cmd = new SqlCommand(query, con);
-            cmd.Parameters.AddWithValue("@Status", status);
-            cmd.Parameters.AddWithValue("@ID", requestId);
             try
             {
                 con.Open();
-                cmd.ExecuteNonQuery();
+                var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    list.Add(reader["ID"].ToString());
+                }
+                reader.Close();
             }
-            catch (Exception ex) { }
             finally
             {
                 con.Close();
             }
+            return list;
         }
 
-        public void UpdateReportCondition(int reportId, string condition)
+
+     
+
+         public void UpdateReportCondition(int reportId, string status)
         {
-            string query = "UPDATE RequestToReport SET Condition = @Condition WHERE ID = @ID";
-            SqlCommand cmd = new SqlCommand(query, con);
-            cmd.Parameters.AddWithValue("@Condition", condition);
-            cmd.Parameters.AddWithValue("@ID", reportId);
+            string query = @"
+        UPDATE RequestOrReport
+        SET Condition = @Condition
+        WHERE RID = @RID AND RType = 'Report';
+    ";
 
-            try
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using (SqlCommand cmd = new SqlCommand(query, con))
             {
-                con.Open();
-                cmd.ExecuteNonQuery();
-            }
-            catch (Exception ex) { }
-            finally { con.Close(); }
-        }
+                cmd.Parameters.AddWithValue("@Condition", status);
+                cmd.Parameters.AddWithValue("@RID", reportId);
 
-        public DataTable LoadAllReports()
+                try
+                {
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error updating report condition: " + ex.Message);
+                    // Optional: throw or log
+                }
+            }
+        }
+              public DataTable LoadAllReports()
         {
             DataTable dt = new DataTable();
-            string query = @"SELECT rr.ID, rr.RoomID, rr.Type, rr.Condition, rr.RequestDate, rr.RequestTime, u.Name AS RequestorName
-                     FROM RequestToReport rr
-                     JOIN [User] u ON rr.UserID = u.UserID
-                     WHERE rr.Condition IN ('Pending', 'In Progress')
-                     ORDER BY rr.RequestDate DESC, rr.RequestTime DESC";
+            string query = @"
+        SELECT 
+            r.ID,
+            cr.RoomID, 
+            rr.Condition,
+            rr.DayofR AS RequestDate, 
+            rr.HourofR AS RequestTime,
+            u.Name AS RequestorName,
+            r.Complaint  -- Complaint field from the Report table
+        FROM Report cr
+        JOIN RequestOrReport rr ON cr.ID = rr.RID
+        JOIN [User] u ON rr.UserID = u.UserID
+        LEFT JOIN Report r ON cr.RoomID = r.RoomID  -- Use RoomID for the join with the Report table
+        WHERE rr.Condition IN ('Pending', 'In Progress') 
+            AND rr.RType = 'Report'
+        ORDER BY rr.DayofR DESC, rr.HourofR DESC;
+    ";
 
             SqlCommand cmd = new SqlCommand(query, con);
             try
@@ -267,9 +311,15 @@ namespace Project.Models
                 con.Open();
                 dt.Load(cmd.ExecuteReader());
             }
-            catch (Exception ex) { }
-            finally { con.Close(); }
-
+            catch (Exception ex)
+            {
+                // Optionally log the error
+                Console.WriteLine("Error: " + ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
             return dt;
         }
           public DataTable LoadCleaningRequestsForStaff()
@@ -446,6 +496,38 @@ namespace Project.Models
             }
         }
 
+           public DataTable LoadDailyCleaningForRoomServices(DateTime date)
+        {
+            DataTable dt = new DataTable();
+            string query = @"
+        SELECT 
+            cr.RoomID, 
+            rr.Condition, 
+            rr.DayofR AS RequestDate
+        FROM CleaningRequest cr
+        JOIN RequestOrReport rr ON cr.ID = rr.RID
+        WHERE rr.RType = 'CleaningRequest'
+        AND rr.DayofR = @Date";
+
+            using (SqlCommand cmd = new SqlCommand(query, con))
+            {
+                cmd.Parameters.AddWithValue("@Date", date.Date);
+                try
+                {
+                    con.Open();
+                    dt.Load(cmd.ExecuteReader());
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: " + ex.Message);
+                }
+                finally
+                {
+                    con.Close();
+                }
+            }
+            return dt;
+        }
 
 
         public string GetUserType(string Email)

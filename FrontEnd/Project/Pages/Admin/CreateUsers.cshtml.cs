@@ -1,23 +1,21 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Project.Models;
 using System.ComponentModel.DataAnnotations;
+using Project.Pages.Models;
 
 namespace Project.Pages.Admin
 {
     public class Create_UsersModel : PageModel
     {
-        public DB db { get; set; }
-        public Create_UsersModel(DB db)
-        {
-            this.db = db;
-        }
+
+        public DB db;
+
         [BindProperty, Required]
         public string UserName { get; set; }
 
         [BindProperty, Required]
-        public string UserId { get; set; }
+        public int UserId { get; set; }
 
         [BindProperty, Required, EmailAddress]
         public string Email { get; set; }
@@ -29,6 +27,12 @@ namespace Project.Pages.Admin
         public string Type { get; set; }
 
         public List<SelectListItem> UserTypes { get; set; }
+
+
+        public Create_UsersModel(DB database) 
+        {
+            db=database;
+        }
 
         public IActionResult OnGet()
         {
@@ -55,6 +59,7 @@ namespace Project.Pages.Admin
             }
 
 
+            db.creat_user(UserId, Password, UserName, Email, Type);
 
             TempData["SuccessMessage"] = "User created successfully!";
             return RedirectToPage();
