@@ -268,22 +268,32 @@ namespace Project.Models
 
      
 
-        public void UpdateReportCondition(int reportId, string condition)
+         public void UpdateReportCondition(int reportId, string status)
         {
-            string query = "UPDATE RequestToReport SET Condition = @Condition WHERE ID = @ID";
-            SqlCommand cmd = new SqlCommand(query, con);
-            cmd.Parameters.AddWithValue("@Condition", condition);
-            cmd.Parameters.AddWithValue("@ID", reportId);
+            string query = @"
+        UPDATE RequestOrReport
+        SET Condition = @Condition
+        WHERE RID = @RID AND RType = 'Report';
+    ";
 
-            try
+            using (SqlConnection con = new SqlConnection(ConnectionString))
+            using (SqlCommand cmd = new SqlCommand(query, con))
             {
-                con.Open();
-                cmd.ExecuteNonQuery();
-            }
-            catch (Exception ex) { }
-            finally { con.Close(); }
-        }
+                cmd.Parameters.AddWithValue("@Condition", status);
+                cmd.Parameters.AddWithValue("@RID", reportId);
 
+                try
+                {
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error updating report condition: " + ex.Message);
+                    // Optional: throw or log
+                }
+            }
+        }
               public DataTable LoadAllReports()
         {
             DataTable dt = new DataTable();
