@@ -1,62 +1,116 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Project.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace Project.Pages.Professor
 {
     public class ReportModel : PageModel
     {
-        public DB db { get; set; }
-        public ReportModel(DB db)
+        private readonly DB _db;
+
+        public ReportModel()
         {
-            this.db = db;
+            _db = new DB();
         }
+
         [BindProperty]
-        [Required]
-        [Display(Name = "Room Code")]
+        [Required(ErrorMessage = "Room code is required")]
         public string RoomCode { get; set; }
 
         [BindProperty]
-        [Required]
-        [Display(Name = "Issue Description")]
-        [StringLength(500, MinimumLength = 20)]
-        public string Description { get; set; }
-
-        [BindProperty]
-        [Required]
-        [Display(Name = "Issue Category")]
         public ReportCategory Category { get; set; }
 
         [BindProperty]
-        [Display(Name = "Urgency Level")]
-        public UrgencyLevel Urgency { get; set; } = UrgencyLevel.Medium;
-        public IActionResult OnGet()
+        public UrgencyLevel Urgency { get; set; }
+
+        [BindProperty]
+        [Required(ErrorMessage = "Description is required")]
+        public string Description { get; set; }
+
+        public enum ReportCategory
         {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserType")))
-            {
-                return RedirectToPage("/Login");
-            }
-            else
+            EquipmentFailure,
+            Maintenance,
+            SafetyHazard,
+            Other
+        }
+
+        public enum UrgencyLevel
+        {
+            Low,
+            Medium,
+            High
+        }
+
+        public void OnGet()
+        {
+        }
+
+        public IActionResult OnPost()
+        {
+            if (!ModelState.IsValid)
             {
                 return Page();
             }
-        }
-    }
-    public enum ReportCategory
-    {
-        EquipmentFailure,
-        SafetyHazard,
-        MaintenanceRequired,
-        CleaningNeeded,
-        Other
-    }
 
-    public enum UrgencyLevel
-    {
-        Low,
-        Medium,
-        High,
-        Critical
+            var userId = _db.GetUserID(User.Identity.Name);
+            if (userId == 0)
+            {
+                ModelState.AddModelError("", "User not found");
+                return Page();
+            }
+
+            try
+            {
+                // Start transaction
+                using (var connection = new SqlConnection(_db.ConnectionString))
+                {
+                    connection.Open();
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        try
+                        {
+                            //  RequestOrReport
+                            var requestQuery = @"
+                                INSERT INTO RequestOrReport (UserID, Condition, DayofR, HourofR, RType)
+                                OUTPUT INSERTED.RID
+                                VALUES (@UserID, 'Pending', GETDATE(), CONVERT(TIME, GETDATE()), 'Report')";
+
+                            var requestCmd = new SqlCommand(requestQuery, connection, transaction);
+                            requestCmd.Parameters.AddWithValue("@UserID", userId);
+                            int newRid = (int)requestCmd.ExecuteScalar();
+
+                            
+                            var reportQuery = @"
+                                INSERT INTO Report (ID, RoomID, Complaint, IssueCategory, UrgencyLevel)
+                                VALUES (@ID, @RoomID, @Complaint, @IssueCategory, @UrgencyLevel)";
+
+                            var reportCmd = new SqlCommand(reportQuery, connection, transaction);
+                            reportCmd.Parameters.AddWithValue("@ID", newRid);
+                            reportCmd.Parameters.AddWithValue("@RoomID", RoomCode);
+                            reportCmd.Parameters.AddWithValue("@Complaint", Description);
+                            reportCmd.Parameters.AddWithValue("@IssueCategory", Category.ToString());
+                            reportCmd.Parameters.AddWithValue("@UrgencyLevel", Urgency.ToString());
+                            reportCmd.ExecuteNonQuery();
+
+                            transaction.Commit();
+                        }
+                        catch
+                        {
+                            transaction.Rollback();
+                            throw;
+                        }
+                    }
+                }
+
+                TempData["ReportSuccess"] = "Report submitted successfully!";
+                return RedirectToPage();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Error submitting report. Please try again.");
+                return Page();
+            }
+        }
     }
 }

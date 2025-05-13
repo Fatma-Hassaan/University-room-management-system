@@ -748,9 +748,60 @@ namespace Project.Models
                 }
                     return dt;
         }
-           
+        public DataTable GetPendingJTARequests(int professorId)
+        {
+            DataTable dt = new DataTable();
+            string query = @"SELECT 
+            rr.RID AS RequestID,
+            u.Name AS StudentName,
+            c.Code AS CourseCode,
+            req.NumOfExtraHours AS RequestedHours,
+            req.RoomID AS RelatedRoom,
+            req.Reason
+            FROM AdditionalQuotaRequest req
+            JOIN RequestOrReport rr ON req.ID = rr.RID
+            JOIN Course c ON req.CourseCode = c.Code
+            JOIN Student s ON rr.UserID = s.ID
+            JOIN [User] u ON s.ID = u.UserID
+            WHERE c.ProfessorID = @ProfessorId 
+            AND rr.Condition = 'Pending'";
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@ProfessorId", professorId);
+            try
+            {
+                con.Open();
+                dt.Load(cmd.ExecuteReader());
+            }
+            catch (Exception ex)
+            {
+                // Handle error
+            }
+            finally
+            {
+                con.Close();
+            }
+            return dt;
+        }
+        public void UpdateRequestStatus(int requestId, string status)
+        {
+            string query = "UPDATE RequestOrReport SET Condition = @Status WHERE RID = @RequestId";
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@Status", status);
+            cmd.Parameters.AddWithValue("@RequestId", requestId);
+
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+
+
     }
-    
 
     public class CourseDetailsResult
     {
