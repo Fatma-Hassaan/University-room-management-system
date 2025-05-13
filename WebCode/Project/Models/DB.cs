@@ -339,7 +339,7 @@ namespace Project.Models
         }
 
 
-        
+
         public string GetUserType(string Email)
         {
             string UserType = "";
@@ -607,7 +607,7 @@ namespace Project.Models
                     cmd.Parameters.AddWithValue("@StudentID", StudentID);
                     cmd.ExecuteNonQuery();
                 }
-            }   
+            }
             catch (Exception ex)
             {
 
@@ -697,30 +697,30 @@ namespace Project.Models
             c.LectureDay AS LectureDay
             FROM Course c
             WHERE c.ProfessorID = @ProfessorId;";
-    
+
             SqlCommand cmd = new SqlCommand(query, con);
             cmd.Parameters.AddWithValue("@ProfessorId", professorId);
-    
-             try
-             {
-             con.Open();
-             dt.Load(cmd.ExecuteReader());
+
+            try
+            {
+                con.Open();
+                dt.Load(cmd.ExecuteReader());
             }
             catch (Exception ex)
             {
-            // Handle error
+                // Handle error
             }
             finally
             {
-            con.Close();
+                con.Close();
             }
             return dt;
         }
 
         public DataTable GetProfessorChangeRequests(int professorId)
         {
-         DataTable dt = new DataTable();
-         string query = @"SELECT 
+            DataTable dt = new DataTable();
+            string query = @"SELECT 
             c.Code AS CourseCode,
             r.ID AS NewRoom,
             rc.Reason,
@@ -731,22 +731,22 @@ namespace Project.Models
             JOIN Room r ON rc.NewRoomID = r.ID
             WHERE c.ProfessorID = @ProfessorId 
             AND rr.Condition = 'Pending';";
-            
+
             SqlCommand cmd = new SqlCommand(query, con);
             cmd.Parameters.AddWithValue("@ProfessorId", professorId);
             try
             {
                 con.Open();
                 dt.Load(cmd.ExecuteReader());
-                }
-                catch (Exception ex)
-                {// Handle error
-                }
-                finally
-                {
-                    con.Close();
-                }
-                    return dt;
+            }
+            catch (Exception ex)
+            {// Handle error
+            }
+            finally
+            {
+                con.Close();
+            }
+            return dt;
         }
         public DataTable GetPendingJTARequests(int professorId)
         {
@@ -799,9 +799,395 @@ namespace Project.Models
                 con.Close();
             }
         }
+        public DataTable GetStudentCourses(int studentId)
+        {
+            DataTable dt = new DataTable();
+            string query = @"
+             SELECT 
+             c.Code AS CourseCode,
+             c.Name AS CourseName,
+             c.LectureRoom AS Room,
+             (SELECT Building FROM Room WHERE ID = c.LectureRoom) AS Building,
+             CONCAT(c.LectureDay, ' ', c.LectureHour, '-', 
+                   DATEADD(MINUTE, c.LectureDuration, c.LectureHour)) AS TimeSlot,
+                   CASE 
+                   WHEN j.Student_ID IS NOT NULL THEN 'JTA Course'
+                   ELSE 'Enrolled Course'
+                   END AS CourseType
+                   FROM Course_Student cs
+                   JOIN Course c ON cs.Course_Code = c.Code
+                   LEFT JOIN JTA j ON cs.Student_ID = j.Student_ID AND cs.Course_Code = j.Course_Code
+                   WHERE cs.Student_ID = @StudentId";
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@StudentId", studentId);
+            try
+            {
+                con.Open();
+                dt.Load(cmd.ExecuteReader());
+            }
+            catch (Exception ex)
+            {
+                // Log error
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+            return dt;
+        }
+
+        public DataTable GetStudentReports(int studentId)
+        {
+            DataTable dt = new DataTable();
+            string query = @"
+        SELECT 
+            r.RoomID AS RoomCode,
+            r.Complaint AS ComplaintDetails,
+            CONVERT(VARCHAR, rr.DayofR, 103) + ' ' + 
+            CONVERT(VARCHAR, rr.HourofR, 108) AS SubmissionDateTime,
+            rr.Condition AS Status
+        FROM RequestOrReport rr
+        JOIN Report r ON rr.RID = r.ID
+        WHERE rr.UserID = @StudentId 
+          AND rr.RType = 'Report'";
+
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@StudentId", studentId);
+
+            try
+            {
+                con.Open();
+                dt.Load(cmd.ExecuteReader());
+            }
+            catch (Exception ex)
+            {
+                // Log error
+            }
+            finally
+            {
+                con.Close();
+            }
+            return dt;
+        }
+
+        public int GetUserID(string email)
+        {
+            string query = @"SELECT UserID FROM [User] WHERE Email = @Email";
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@Email", email);
+
+            try
+            {
+                con.Open();
+                return (int)cmd.ExecuteScalar();
+            }
+            catch
+            {
+                return 0;
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
 
 
-    }
+        public DataTable GetStudentBookings(int studentId)
+        {
+            DataTable dt = new DataTable();
+            string query = @"
+        SELECT 
+            rb.ID AS BookingID,
+            rb.RoomID AS RoomCode,
+            rb.Reason,
+            CONVERT(VARCHAR, rr.DayofR, 103) + ' ' + 
+            CONVERT(VARCHAR, rb.TimeSlotHour, 108) + ' - ' + 
+            CONVERT(VARCHAR, DATEADD(MINUTE, rb.Duration, rb.TimeSlotHour), 108) AS TimeSlot,
+            CASE 
+                WHEN cbr.ID IS NOT NULL THEN 'Yes' 
+                ELSE 'No' 
+            END AS ForClinic,
+            c.Name AS CourseName
+        FROM RequestOrReport rr
+        LEFT JOIN RoomBooking rb ON rr.RID = rb.ID
+        LEFT JOIN ClinicBookingRequest cbr ON rr.RID = cbr.ID
+        LEFT JOIN Course c ON cbr.CourseCode = c.Code
+        WHERE rr.UserID = @StudentId";
+
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@StudentId", studentId);
+
+            try
+            {
+                con.Open();
+                dt.Load(cmd.ExecuteReader());
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine($"Error getting student bookings: {ex.Message}");
+            }
+            finally
+            {
+                con.Close();
+            }
+            return dt;
+        }
+
+        // ta pages queries 
+        public DataTable GetTARooms(int taId)
+        {
+            DataTable dt = new DataTable();
+            string query = @"
+        SELECT 
+            c.Code AS CourseCode,
+            c.Name AS CourseName,
+            c.TutorialRoom AS Room,
+            (SELECT Building FROM Room WHERE ID = c.TutorialRoom) AS Building,
+            CONCAT(c.TutorialDay, ' ', 
+                   CONVERT(VARCHAR, c.TutorialHour, 108), '-', 
+                   CONVERT(VARCHAR, DATEADD(MINUTE, c.TutorialDuration, c.TutorialHour), 108)) AS TimeSlot
+        FROM Course_TA ct
+        JOIN Course c ON ct.Course_Code = c.Code
+        WHERE ct.TA_ID = @TAId";
+
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@TAId", taId);
+
+            try
+            {
+                con.Open();
+                dt.Load(cmd.ExecuteReader());
+            }
+            catch (Exception ex)
+            {
+                // Log error
+                Console.WriteLine($"Error getting TA rooms: {ex.Message}");
+            }
+            finally
+            {
+                con.Close();
+            }
+            return dt;
+        }
+
+        public DataTable GetTAPendingRequests(int taId)
+        {
+            DataTable dt = new DataTable();
+            string query = @"
+        SELECT 
+            c.Code AS CourseCode,
+            rep.Complaint AS Reason,
+            rr.Condition AS Status
+        FROM Course_TA ct
+        JOIN Course c ON ct.Course_Code = c.Code
+        JOIN Report rep ON rep.RoomID = c.TutorialRoom
+        JOIN RequestOrReport rr ON rep.ID = rr.RID
+        WHERE ct.TA_ID = @TAId 
+          AND rr.Condition = 'Pending'";
+
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@TAId", taId);
+
+            try
+            {
+                con.Open();
+                dt.Load(cmd.ExecuteReader());
+            }
+            catch (Exception ex)
+            {
+                // Log error
+                Console.WriteLine($"Error getting TA pending requests: {ex.Message}");
+            }
+            finally
+            {
+                con.Close();
+            }
+            return dt;
+        }
+
+        public void SubmitTAReport(int taId, string roomCode, string description)
+        {
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // Insert into RequestOrReport
+                        var requestQuery = @"
+                    INSERT INTO RequestOrReport 
+                        (UserID, Condition, DayofR, HourofR, RType)
+                    OUTPUT INSERTED.RID
+                    VALUES (@UserID, 'Pending', GETDATE(), CONVERT(TIME, GETDATE()), 'Report')";
+
+                        var requestCmd = new SqlCommand(requestQuery, connection, transaction);
+                        requestCmd.Parameters.AddWithValue("@UserID", taId);
+                        int newRid = (int)requestCmd.ExecuteScalar();
+
+                        // Insert into Report
+                        var reportQuery = @"
+                    INSERT INTO Report 
+                        (ID, RoomID, Complaint)
+                    VALUES (@ID, @RoomID, @Complaint)";
+
+                        var reportCmd = new SqlCommand(reportQuery, connection, transaction);
+                        reportCmd.Parameters.AddWithValue("@ID", newRid);
+                        reportCmd.Parameters.AddWithValue("@RoomID", roomCode);
+                        reportCmd.Parameters.AddWithValue("@Complaint", description);
+                        reportCmd.ExecuteNonQuery();
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
+
+        public DataTable GetTAReports(int taId)
+        {
+            DataTable dt = new DataTable();
+            string query = @"
+        SELECT 
+            r.RoomID AS RoomCode,
+            r.Complaint AS IssueDescription,
+            CONVERT(VARCHAR, rr.DayofR, 103) + ' ' + 
+            CONVERT(VARCHAR, rr.HourofR, 108) AS SubmissionDateTime,
+            rr.Condition AS Status
+        FROM RequestOrReport rr
+        JOIN Report r ON rr.RID = r.ID
+        WHERE rr.UserID = @TAId 
+          AND rr.RType = 'Report'";
+
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@TAId", taId);
+
+            try
+            {
+                con.Open();
+                dt.Load(cmd.ExecuteReader());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting TA reports: {ex.Message}");
+            }
+            finally
+            {
+                con.Close();
+            }
+            return dt;
+        }
+        
+        public int GetTARemainingQuota(int taId)
+        {
+            string query = @"
+        SELECT 
+            t.Quota - ISNULL(SUM(rb.Duration), 0) AS RemainingQuota
+        FROM TA t
+        LEFT JOIN RequestOrReport rr ON rr.UserID = t.ID
+        LEFT JOIN RoomBooking rb ON rr.RID = rb.ID
+            AND rr.RType = 'RoomBooking'  
+            AND MONTH(rr.DayofR) = MONTH(GETDATE())  
+            AND YEAR(rr.DayofR) = YEAR(GETDATE())
+        WHERE t.ID = @TAId
+        GROUP BY t.Quota";
+
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@TAId", taId);
+
+            try
+            {
+                con.Open();
+                return Convert.ToInt32(cmd.ExecuteScalar());
+            }
+            catch
+            {
+                return 0;
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+
+        public DataTable GetTAAssignedCourses(int taId)
+        {
+            DataTable dt = new DataTable();
+            string query = @"
+        SELECT 
+            c.Code AS CourseCode,
+            c.Name AS CourseName,
+            c.TutorialRoom AS DefaultRoom
+        FROM Course_TA ct
+        JOIN Course c ON ct.Course_Code = c.Code
+        WHERE ct.TA_ID = @TAId";
+
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@TAId", taId);
+
+            try
+            {
+                con.Open();
+                dt.Load(cmd.ExecuteReader());
+            }
+            finally
+            {
+                con.Close();
+            }
+            return dt;
+        }
+
+        public void SubmitTABooking(int taId, string roomCode, string day, TimeSpan time, string courseCode)
+        {
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                connection.Open();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // Insert into RequestOrReport
+                        var requestQuery = @"
+                    INSERT INTO RequestOrReport 
+                        (UserID, Condition, DayofR, HourofR, RType)
+                    OUTPUT INSERTED.RID
+                    VALUES (@UserID, 'Pending', GETDATE(), @Hour, 'RoomBooking')";
+
+                        var requestCmd = new SqlCommand(requestQuery, connection, transaction);
+                        requestCmd.Parameters.AddWithValue("@UserID", taId);
+                        requestCmd.Parameters.AddWithValue("@Hour", time);
+                        int newRid = (int)requestCmd.ExecuteScalar();
+
+                        // Insert into RoomBooking
+                        var bookingQuery = @"
+                    INSERT INTO RoomBooking 
+                        (ID, RoomID, Reason, TimeSlotDay, TimeSlotHour, Duration, CourseCode)
+                    VALUES (@ID, @RoomID, 'Tutorial Session', @Day, @Hour, 120, @CourseCode)";
+
+                        var bookingCmd = new SqlCommand(bookingQuery, connection, transaction);
+                        bookingCmd.Parameters.AddWithValue("@ID", newRid);
+                        bookingCmd.Parameters.AddWithValue("@RoomID", roomCode);
+                        bookingCmd.Parameters.AddWithValue("@Day", day);
+                        bookingCmd.Parameters.AddWithValue("@Hour", time);
+                        bookingCmd.Parameters.AddWithValue("@CourseCode", courseCode);
+                        bookingCmd.ExecuteNonQuery();
+
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+        }
 
     public class CourseDetailsResult
     {
@@ -811,6 +1197,6 @@ namespace Project.Models
         public List<int> Student_IDs { get; set; }
 
     }
-    
-    
+
+
 }

@@ -1,74 +1,104 @@
-using System.ComponentModel.DataAnnotations;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Project.Models;
+using System.ComponentModel.DataAnnotations;
+using System.Data;
+using System.Globalization;
 
 namespace Project.Pages.TA
 {
     public class Room_BookingModel : PageModel
     {
-        public DB db { get; set; }
+        private readonly DB _db;
+
         public Room_BookingModel(DB db)
         {
-            this.db = db;
+            _db = db;
         }
+
+        public int RemainingQuota { get; set; }
+
         [BindProperty]
-        [Required]
-        [Display(Name = "Room Code")]
+        [Required(ErrorMessage = "Room code is required")]
         public string RoomCode { get; set; }
 
         [BindProperty]
-        [Required]
-        [Display(Name = "Time Slot")]
+        [Required(ErrorMessage = "Time slot is required")]
         public string TimeSlot { get; set; }
 
         [BindProperty]
-        [Display(Name = "Tutorial Course")]
+        [Required(ErrorMessage = "Tutorial selection is required")]
         public string SelectedTutorial { get; set; }
 
-        [BindProperty]
-        [Range(1, 4)]
-        [Display(Name = "Duration (hours)")]
-        public int Duration { get; set; }
+        public List<Course> AvailableTutorials { get; set; } = new List<Course>();
 
-        public List<Tutorial> AvailableTutorials { get; set; }
-        public int RemainingQuota { get; set; }
-
-        public IActionResult OnGet()
+        public class Course
         {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserType")))
-            {
-                return RedirectToPage("/Login");
-            }
+            public string CourseCode { get; set; }
+            public string CourseName { get; set; }
+            public string DefaultRoom { get; set; }
+        }
 
-            LoadTutorialData(); // <-- init here
-            return Page();
+        public void OnGet()
+        {
+            var taId = GetTAId();
+            if (taId == 0) return;
+
+            // Get remaining quota
+            RemainingQuota = _db.GetTARemainingQuota(taId);
+
+            // Get assigned courses
+            DataTable coursesDt = _db.GetTAAssignedCourses(taId);
+            foreach (DataRow row in coursesDt.Rows)
+            {
+                AvailableTutorials.Add(new Course
+                {
+                    CourseCode = row["CourseCode"].ToString(),
+                    CourseName = row["CourseName"].ToString(),
+                    DefaultRoom = row["DefaultRoom"].ToString()
+                });
+            }
         }
 
         public IActionResult OnPost()
         {
             if (!ModelState.IsValid)
             {
-                LoadTutorialData(); // <-- init again in OnPost
                 return Page();
             }
 
-            // TODO: Save booking to DB or perform action
+            var taId = GetTAId();
+            if (taId == 0)
+            {
+                ModelState.AddModelError("", "TA not found");
+                return Page();
+            }
 
-            TempData["Success"] = "Room booked successfully!";
-            return RedirectToPage(); // or redirect to another page
+            try
+            {
+                // Parse time slot input
+                var timeSlotParts = TimeSlot.Split(' ');
+                var day = timeSlotParts[0];
+                var time = TimeSpan.Parse(timeSlotParts[1]);
+
+                _db.SubmitTABooking(taId, RoomCode, day, time, SelectedTutorial);
+                TempData["SuccessMessage"] = "Room booking requested successfully!";
+                return RedirectToPage();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Error submitting booking: {ex.Message}");
+                return Page();
+            }
         }
 
-        private void LoadTutorialData()
+        private int GetTAId()
         {
-            // Dummy data - replace with your actual data source
-            AvailableTutorials = new List<Tutorial>
+            if (User.Identity.IsAuthenticated)
             {
-                new Tutorial { CourseCode = "MATH101" },
-                new Tutorial { CourseCode = "PHYS202" }
-            };
-
-            RemainingQuota = 3;
+                return _db.GetUserID(User.Identity.Name);
+            }
+            return 0;
         }
     }
 }

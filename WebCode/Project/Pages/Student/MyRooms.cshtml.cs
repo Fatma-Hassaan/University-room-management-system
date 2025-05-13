@@ -1,54 +1,79 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Project.Models;
+using System.Data;
+using System.Security.Claims;
 
 namespace Project.Pages.Student
 {
     public class My_RoomsModel : PageModel
     {
-        public DB db { get; set; }
+        private readonly DB _db;
+        
+        public List<Course> JTACourses { get; set; } = new List<Course>();
+        public List<Course> EnrolledCourses { get; set; } = new List<Course>();
+
         public My_RoomsModel(DB db)
         {
-            this.db = db;
+            _db = db;
         }
-        public List<CourseInfo> JTACourses { get; set; } = new();
-        public List<CourseInfo> EnrolledCourses { get; set; } = new();
-        public IActionResult OnGet()
+
+        public void OnGet()
         {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserType")))
-            {
-                return RedirectToPage("/Login");
-            }
-            else
-            {
-                JTACourses.Add(new CourseInfo
-                {
-                    CourseCode = "CS101",
-                    CourseName = "Intro to Programming",
-                    RoomNumber = "R101",
-                    RoomLocation = "Building A",
-                    TimeSlot = "Mon 10:00-12:00"
-                });
+            var studentId = GetStudentId();
+            if (studentId == 0) return;
 
-                EnrolledCourses.Add(new CourseInfo
+            DataTable coursesDt = _db.GetStudentCourses(studentId);
+            
+            foreach (DataRow row in coursesDt.Rows)
+            {
+                var course = new Course
                 {
-                    CourseCode = "MATH202",
-                    CourseName = "Calculus II",
-                    RoomNumber = "R205",
-                    RoomLocation = "Building B",
-                    TimeSlot = "Wed 2:00-4:00"
-                });
-                return Page();
+                    CourseCode = row["CourseCode"].ToString(),
+                    CourseName = row["CourseName"].ToString(),
+                    RoomNumber = $"{row["Building"]} {row["Room"]}",
+                    RoomLocation = GetRoomLocation(row["Building"].ToString()),
+                    TimeSlot = FormatTimeSlot(row["TimeSlot"].ToString())
+                };
+
+                if (row["CourseType"].ToString() == "JTA Course")
+                    JTACourses.Add(course);
+                else
+                    EnrolledCourses.Add(course);
             }
         }
-    }
 
-    public class CourseInfo
-    {
-        public string CourseCode { get; set; }
-        public string CourseName { get; set; }
-        public string RoomNumber { get; set; }
-        public string RoomLocation { get; set; }
-        public string TimeSlot { get; set; }
+        private int GetStudentId()
+        {
+            
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            return userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
+        }
+
+        private string GetRoomLocation(string building)
+        {
+            
+            return building switch
+            {
+                "G" => "Main Campus - Building G",
+                "B" => "Science Complex - Building B",
+                _ => "University Campus"
+            };
+        }
+
+        private string FormatTimeSlot(string rawSlot)
+        {
+           
+            return DateTime.TryParse(rawSlot.Split(' ')[1], out var startTime)
+                ? $"{rawSlot.Split(' ')[0]} {startTime:hh\\:mm tt}"
+                : rawSlot;
+        }
+
+        public class Course
+        {
+            public string CourseCode { get; set; }
+            public string CourseName { get; set; }
+            public string RoomNumber { get; set; }
+            public string RoomLocation { get; set; }
+            public string TimeSlot { get; set; }
+        }
     }
 }
