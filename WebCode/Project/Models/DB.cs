@@ -201,40 +201,72 @@ namespace Project.Models
             return dt;
         }
 
-        public DataTable LoadQuotaRequests()
+               public DataTable LoadQuotaRequests()
         {
             DataTable dt = new DataTable();
-            string query = "SELECT ID, UserID, UserType, ExtraHours, Reason, Status FROM QuotaRequest WHERE Status != 'Handled'";
+            string query = @"
+        SELECT 
+            aqr.ID,
+            rr.UserID,
+            u.UserType,
+            aqr.NumOfExtraHours AS ExtraHours,
+            aqr.Reason,
+            rr.Condition AS Status
+        FROM AdditionalQuotaRequest aqr
+        JOIN RequestOrReport rr ON aqr.ID = rr.RID
+        JOIN [User] u ON rr.UserID = u.UserID
+        WHERE rr.Condition = 'Pending' AND rr.RType = 'AdditionalQuotaRequest'
+        ORDER BY rr.DayofR DESC, rr.HourofR DESC;
+    ";
+
             SqlCommand cmd = new SqlCommand(query, con);
             try
             {
                 con.Open();
                 dt.Load(cmd.ExecuteReader());
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error loading quota requests: " + ex.Message);
+            }
             finally
             {
                 con.Close();
             }
+
             return dt;
         }
 
-        public void UpdateQuotaStatus(int requestId, string status)
+        public void UpdateQuotaStatus(int requestId, string newStatus)
         {
-            string query = "UPDATE QuotaRequest SET Status = @Status WHERE ID = @ID";
-            SqlCommand cmd = new SqlCommand(query, con);
-            cmd.Parameters.AddWithValue("@Status", status);
-            cmd.Parameters.AddWithValue("@ID", requestId);
-            try
+            string query = @"
+        UPDATE RequestOrReport
+        SET Condition = @Status
+        WHERE RID = @RID AND RType = 'AdditionalQuotaRequest';
+    ";
+
+            using (SqlCommand cmd = new SqlCommand(query, con))
             {
-                con.Open();
-                cmd.ExecuteNonQuery();
-            }
-            catch (Exception ex) { }
-            finally
-            {
-                con.Close();
+                cmd.Parameters.AddWithValue("@Status", newStatus);
+                cmd.Parameters.AddWithValue("@RID", requestId);
+
+                try
+                {
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error updating quota status: " + ex.Message);
+                }
+                finally
+                {
+                    con.Close();
+                }
             }
         }
+
+     
 
         public void UpdateReportCondition(int reportId, string condition)
         {
