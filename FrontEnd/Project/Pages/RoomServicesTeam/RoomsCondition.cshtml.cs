@@ -5,33 +5,35 @@ using System.Data;
 
 namespace Project.Pages.RoomServicesTeam
 {
-    public class Rooms_ConditionModel : PageModel
+    public class RoomConditionModel : PageModel
     {
-        public DB db { get; set; }
-        public Rooms_ConditionModel(DB db)
+        private readonly DB db;
+
+        public DataTable RoomConditionTable { get; set; }
+        public List<string> RoomList { get; set; }
+
+        [BindProperty]
+        public string SelectedRoomId { get; set; }
+
+        public RoomConditionModel(DB db)
         {
             this.db = db;
         }
 
-        public DataTable RoomsTable { get; set; }
-
-        [BindProperty]
-        public string RoomId { get; set; }
-
         public IActionResult OnGet()
         {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserType")))
-            {
-                return RedirectToPage("/Login");
-            }
-
-            RoomsTable = db.LoadRoomConditions(); // This method should return a DataTable with RoomID & Condition columns
+            RoomList = db.GetAvailableRoomIDs();
+            RoomConditionTable = db.LoadRoomAvailabilityStatuses();
             return Page();
         }
 
-        public IActionResult OnPostToggle()
+        public IActionResult OnPostToggleCondition()
         {
-            db.ToggleRoomCondition(RoomId); // This method toggles Open/Close for the selected room
+            if (!string.IsNullOrEmpty(SelectedRoomId))
+            {
+                db.ToggleRoomAvailability(SelectedRoomId);
+            }
+
             return RedirectToPage();
         }
     }

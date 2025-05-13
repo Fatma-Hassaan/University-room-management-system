@@ -8,6 +8,13 @@ namespace Project.Pages.RoomServicesTeam
     public class ReportsModel : PageModel
     {
         public DB db { get; set; }
+        
+        [BindProperty]
+        public int SelectedReport { get; set; }
+
+        [BindProperty]
+        public string SelectedCondition { get; set; }
+
         public DataTable ReportsTable { get; set; } = new DataTable();
 
         public ReportsModel(DB db)
@@ -17,24 +24,25 @@ namespace Project.Pages.RoomServicesTeam
 
         public IActionResult OnGet()
         {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserType")))
-            {
-                return RedirectToPage("/Login");
-            }
-
             ReportsTable = db.LoadAllReports();
             return Page();
         }
 
-        public IActionResult OnPostMarkAs(string status, int reportId)
+        // Called when the Update button is pressed in the form
+        public IActionResult OnPostUpdateReportStatus()
         {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserType")))
+            if (SelectedReport != 0 && !string.IsNullOrEmpty(SelectedCondition))
             {
-                return RedirectToPage("/Login");
+                db.UpdateReportCondition(SelectedReport, SelectedCondition); // Update the report condition
             }
 
-            db.UpdateReportCondition(reportId, status);
-            return RedirectToPage(); 
+            // Reload updated report data
+            ReportsTable = db.LoadAllReports();
+
+            // Redirect to refresh the page and reflect the update
+            return RedirectToPage();
         }
+
+
     }
 }

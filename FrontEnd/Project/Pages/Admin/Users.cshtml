@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model UsersModel
 @{
     ViewData["Title"] = "Users";
@@ -9,20 +9,17 @@
         <div class="card-body">
             <form method="get" class="row g-3">
                 <div class="col-md-3">
-                    <label asp-for="UserType" class="form-label">Type</label>
-                    <select asp-for="UserType" class="form-select">
-                        <option value=''>All</option>
-                        <option value='Student'>Student</option>
-                        <option value='TA'>TA</option>
-                        <option value='Professor'>Professor</option>
-                        <option value='Registrar'>Registrar</option>
-                        <option value='CleaningStaff'>Cleaning Staff</option>
-                        <option value='RoomServicesMember'>Room Servicing</option>
+                    <label asp-for="Input.UserType" class="form-label">Type</label>
+                    <select asp-for="Input.UserType" class="form-select">
+                        <option value="">All</option>
+                        <option>Student</option>
+                        <option>TA</option>
+                        <option>Professor</option>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label asp-for="Name" class="form-label">Name</label>
-                    <input asp-for="Name" class="form-control" placeholder="e.g., John Doe">
+                    <label asp-for="Input.Name" class="form-label">Name</label>
+                    <input asp-for="Input.Name" class="form-control" placeholder="e.g., John Doe">
                 </div>
                 <div class="col-12">
                     <button type="submit" class="btn btn-primary w-100 py-2" style="background-color:#2c3e50;">Search Users</button>
@@ -31,7 +28,8 @@
         </div>
     </div>
 
-    @if (Model.Searched && Model.DT.Rows.Count > 0)
+    
+    @if (Model.SearchResults?.Any() == true)
     {
         <div class="table-responsive">
             <table class="table table-bordered table-striped">
@@ -45,31 +43,23 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for (int i = 0; i < Model.DT.Rows.Count; i++)
+                    @foreach (var user in Model.SearchResults)
                     {
                         <tr>
-                        @for (int j = 0; j < Model.DT.Columns.Count; j++)
-                        {
-                         <td>@Model.DT.Rows[i][j]</td>   
-                        }
+                            <td>user.Id</td>
+                            <td>user.UserType</td>
+                            <td>user.Name</td>
+                            <td>user.Email</td>
                             <td>
-                                <form method="post" asp-page-handler="SetType" class="d-flex">
-                                <input type="hidden" name="UserID" value="@Model.DT.Rows[i]["UserID"]" />
-                                <select name="NewType" class="form-select form-select-sm me-2" style="width: 120px; background-color: #f8f9fa; border-color: #ced4da;">
+                                <div class="d-flex">
+                                    <select class="form-select form-select-sm me-2" style="width: 120px; background-color: #f8f9fa; border-color: #ced4da;">
                                         <option selected disabled>Set Type</option>
-                                        <option value='Student'>Student</option>
-                                        <option value='TA'>TA</option>
-                                        <option value='Professor'>Professor</option>
-                                        <option value='Registrar'>Registrar</option>
-                                        <option value='CleaningStaff'>Cleaning Staff</option>
-                                        <option value='RoomServicesMember'>Room Servicing</option>
-                                    </select>                                
-                                    <button class="btn btn-sm btn-outline-secondary ms-1">Edit</button>
-                                </form>
-
+                                        <option>Student</option>
+                                        <option>TA</option>
+                                        <option>Professor</option>
+                                    </select>                                <button class="btn btn-sm btn-outline-secondary ms-1">Edit</button>
                             </td>
                         </tr>
-
                     }
                 </tbody>
             </table>
@@ -79,9 +69,6 @@
     {
         <div class="alert alert-info">No users found matching your criteria.</div>
     }
-
-
-
 </div>
 
 <style>

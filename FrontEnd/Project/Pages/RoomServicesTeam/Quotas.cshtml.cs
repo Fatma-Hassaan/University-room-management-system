@@ -5,36 +5,40 @@ using System.Data;
 
 namespace Project.Pages.RoomServicesTeam
 {
-    public class QuotasModel : PageModel
+    public class QuotaModel : PageModel
     {
-        public DB db { get; set; }
-        public DataTable QuotaRequests { get; set; } = new DataTable();
+        private readonly DB db;
+        public DataTable QuotaRequestsTable { get; set; } = new DataTable();
 
-        public QuotasModel(DB db)
+        [BindProperty]
+        public string SelectedStatus { get; set; }
+
+        [BindProperty]
+        public int SelectedRequestId { get; set; }
+
+        public QuotaModel(DB db)
         {
             this.db = db;
         }
 
+        // OnGet loads all the quota requests
         public IActionResult OnGet()
         {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserType")))
-            {
-                return RedirectToPage("/Login");
-            }
-
-            QuotaRequests = db.LoadQuotaRequests(); 
+            QuotaRequestsTable = db.LoadQuotaRequests();
             return Page();
         }
 
-        public IActionResult OnPostSetStatus(int requestId, string status)
+        // OnPost handles the update of the quota request status
+        public IActionResult OnPostUpdateStatus()
         {
-           if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserType")))
+            if (SelectedRequestId != 0 && !string.IsNullOrEmpty(SelectedStatus))
             {
-                return RedirectToPage("/Login");
+                db.UpdateQuotaStatus(SelectedRequestId, SelectedStatus); // Update status
             }
 
-            db.UpdateQuotaStatus(requestId, status); 
-            return RedirectToPage();
+            // Reload the quota requests after update
+            QuotaRequestsTable = db.LoadQuotaRequests();
+            return RedirectToPage(); // Refresh the page to show updated data
         }
     }
 }

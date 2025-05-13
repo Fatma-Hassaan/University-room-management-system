@@ -89,45 +89,78 @@ namespace Project.Models
             }
         }
 
-        public DataTable LoadAllCleaningRequests()
+       public DataTable LoadAllCleaningRequestsForRoomServices()
         {
-            string query = "SELECT * FROM RequestToReport WHERE Type = 'Cleaning' ORDER BY RequestDate DESC, RequestTime DESC";
-            SqlCommand cmd = new SqlCommand(query, con);
             DataTable dt = new DataTable();
-            try
+
+            string query = @"
+              SELECT 
+                rr.RID,
+                cr.RoomID,
+                rr.Condition,
+                rr.DayofR AS RequestDate,
+                rr.HourofR AS RequestTime,
+                u.Name AS RequestorName
+            FROM CleaningRequest cr
+            JOIN RequestOrReport rr ON cr.ID = rr.RID
+            JOIN [User] u ON rr.UserID = u.UserID
+            WHERE rr.RType = 'CleaningRequest'
+            ORDER BY rr.DayofR DESC, rr.HourofR DESC;
+            
+            ";
+
+            using (SqlCommand cmd = new SqlCommand(query, con))
             {
-                con.Open();
-                dt.Load(cmd.ExecuteReader());
+                try
+                {
+                    con.Open();
+                    dt.Load(cmd.ExecuteReader());
+                }
+                finally
+                {
+                    con.Close();
+                }
             }
-            finally
-            {
-                con.Close();
-            }
+
             return dt;
         }
 
-        public void InsertCleaningRequest(int userId, string roomId)
+
+      public void InsertCleaningRequest(int userId, string roomId)
         {
-            string query = "INSERT INTO RequestToReport (UserID, RoomID, Type, Condition, RequestDate, RequestTime) " +
-                           "VALUES (@UserID, @RoomID, 'Cleaning', 'Undone', GETDATE(), GETDATE())";
-            SqlCommand cmd = new SqlCommand(query, con);
-            cmd.Parameters.AddWithValue("@UserID", userId);
-            cmd.Parameters.AddWithValue("@RoomID", roomId);
-            try
+            string insertMain = @"
+        INSERT INTO RequestOrReport (RID, UserID, Condition, DayofR, HourofR, RType)
+        VALUES ((SELECT ISNULL(MAX(RID), 0) + 1 FROM RequestOrReport), @UserID, 'Pending', CAST(GETDATE() AS DATE), CAST(GETDATE() AS TIME), 'CleaningRequest');
+        DECLARE @NewRID INT = (SELECT MAX(RID) FROM RequestOrReport);
+        INSERT INTO CleaningRequest (ID, RoomID) VALUES (@NewRID, @RoomID);
+    ";
+
+            using (SqlCommand cmd = new SqlCommand(insertMain, con))
             {
-                con.Open();
-                cmd.ExecuteNonQuery();
-            }
-            finally
-            {
-                con.Close();
+                cmd.Parameters.AddWithValue("@UserID", userId);
+                cmd.Parameters.AddWithValue("@RoomID", roomId);
+                try
+                {
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("InsertCleaningRequest Error: " + ex.Message);
+                }
+                finally
+                {
+                    con.Close();
+                }
             }
         }
+
+
 
         public List<string> GetAvailableRoomIDs()
         {
             var list = new List<string>();
-            string query = "SELECT ID FROM Room"; // Adjust if needed
+            string query = "SELECT ID FROM Room"; 
             SqlCommand cmd = new SqlCommand(query, con);
             try
             {
@@ -239,13 +272,56 @@ namespace Project.Models
 
             return dt;
         }
-
-        public DataTable LoadDailyCleaningStatuses()
+          public DataTable LoadCleaningRequestsForStaff()
         {
-            DataTable dt = new DataTable();
-            string query = "SELECT RoomID, Condition FROM CleaningRequest";
+            string query = @"
+        SELECT 
+            rr.RID AS ID,
+            cr.RoomID,
+            u.Name AS RequestorName,
+            rr.DayofR AS RequestDate,
+            rr.HourofR AS RequestTime,
+            rr.Condition
+        FROM RequestOrReport rr
+        JOIN CleaningRequest cr ON rr.RID = cr.ID
+        JOIN [User] u ON rr.UserID = u.UserID
+        WHERE rr.Condition IN ('Pending', 'In progress')
+        ORDER BY rr.DayofR DESC, rr.HourofR DESC;";
 
             SqlCommand cmd = new SqlCommand(query, con);
+            DataTable dt = new DataTable();
+
+            try
+            {
+                con.Open();
+                dt.Load(cmd.ExecuteReader());
+            }
+            finally
+            {
+                con.Close();
+            }
+
+            return dt;
+        }
+          public DataTable LoadDailyCleaningStatuses(DateTime? dateFilter = null)
+        {
+            DataTable dt = new DataTable();
+
+            string query = @"
+              SELECT
+            cr.RoomID,
+            rr.Condition
+        FROM CleaningRequest cr
+        JOIN RequestOrReport rr ON cr.ID = rr.RID
+        WHERE rr.RType = 'CleaningRequest'
+          AND rr.Condition IN ('Pending', 'In progress')
+          AND   rr.DayofR = @SelectedDate
+        ORDER BY cr.RoomID;
+            ";
+
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@SelectedDate", (object?)dateFilter ?? DBNull.Value);
+
             try
             {
                 con.Open();
@@ -253,18 +329,51 @@ namespace Project.Models
             }
             catch (Exception ex)
             {
-                // Optionally log
+                Console.WriteLine("Error loading filtered statuses: " + ex.Message);
             }
             finally
             {
                 con.Close();
             }
+
             return dt;
         }
 
-        public void UpdateRoomCleaningStatus(string roomId, string condition)
+        public void UpdateCleaningRequestStatus(int requestId, string status)
         {
-            string query = "UPDATE CleaningRequest SET Condition = @Condition WHERE RoomID = @RoomID";
+            string query = @"
+        UPDATE RequestOrReport
+        SET Condition = @Condition,
+            DayofHandling = CAST(GETDATE() AS DATE),
+            HourofHandling = CAST(GETDATE() AS TIME)
+        WHERE RID = @RID AND RType = 'CleaningRequest';";
+
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@RID", requestId);
+            cmd.Parameters.AddWithValue("@Condition", status);
+
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
+        
+     public void UpdateDailyCleaningStatus(string roomId, string condition)
+        {
+            string query = @"
+        UPDATE rr
+        SET rr.Condition = @Condition,
+            rr.DayofHandling = CAST(GETDATE() AS DATE),
+            rr.HourofHandling = CAST(GETDATE() AS TIME)
+        FROM RequestOrReport rr
+        JOIN CleaningRequest cr ON rr.RID = cr.ID
+        WHERE cr.RoomID = @RoomID";
+
             SqlCommand cmd = new SqlCommand(query, con);
             cmd.Parameters.AddWithValue("@Condition", condition);
             cmd.Parameters.AddWithValue("@RoomID", roomId);
@@ -276,14 +385,13 @@ namespace Project.Models
             }
             catch (Exception ex)
             {
-                // Optionally log
+                Console.WriteLine("Error updating status: " + ex.Message);
             }
             finally
             {
                 con.Close();
             }
         }
-
 
         public DataTable LoadCleaningRequests()
         {
@@ -1200,6 +1308,258 @@ namespace Project.Models
         public List<int> Student_IDs { get; set; }
 
     }
+
+
+
+
+
+
+
+ //student#
+ public int student_quota(string email)
+ {
+     int quota = 0;
+     string query = "\r\nSELECT Quota\r\nFROM   Student S\r\ninner Join [User] As u on u.UserID =S.ID\r\nWHere u.Email= @Email;";
+     SqlCommand cmd = new SqlCommand(query, con);
+     cmd.Parameters.Add("@Email", SqlDbType.NVarChar, 100).Value = email;
+
+     try
+     {
+         con.Open();
+         quota = (int)cmd.ExecuteScalar();
+     }
+     catch (Exception ex)
+     {
+         Console.WriteLine(ex.Message);
+     }
+     finally
+     {
+         con.Close();
+     }
+     return quota;
+ }
+
+
+
+        public void insert_extra_hours_quota(string email, int hours_extra,string reason)
+        {
+            string query = @"DECLARE @UserID INT = (SELECT u.UserID FROM[User] u WHERE u.Email = @Email);
+            DECLARE @RID    INT = ISNULL((SELECT MAX(RID) FROM RequestOrReport), 0) +1;
+
+            INSERT INTO RequestOrReport(RID, UserID, Condition, DayofR, HourofR, RType)
+VALUES(@RID, @UserID, 'Pending', CAST(GETDATE() AS date), CAST(GETDATE() AS time), 'AdditionalQuotaRequest');
+
+            INSERT INTO AdditionalQuotaRequest(ID, NumOfExtraHours, reason)
+VALUES(@RID, @ExtraHours, @Reason); ";
+
+
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.Add("@Email", SqlDbType.NVarChar, 100).Value = email;
+            cmd.Parameters.Add("@ExtraHours", SqlDbType.Int).Value = hours_extra;
+            cmd.Parameters.Add("@Reason", SqlDbType.NVarChar, 255).Value = reason;
+
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                
+            }
+            catch (Exception ex) { Console.WriteLine(ex.Message); }
+            finally { con.Close(); }
+
+
+        }
+
+
+
+ ////////////////////////////////////////////////////////////////////////////////////////////
+ ///TA///////////////////
+ ///
+
+ public int TA_quota(string email)
+ {
+     int quota = 0;
+     string query = "\r\nSELECT Quota\r\nFROM   TA S\r\ninner Join [User] As u on u.UserID =S.ID\r\nWHere u.Email= @Email;";
+     SqlCommand cmd = new SqlCommand(query, con);
+     cmd.Parameters.Add("@Email", SqlDbType.NVarChar, 100).Value = email;
+
+     try
+     {
+         con.Open();
+         quota = (int)cmd.ExecuteScalar();
+     }
+     catch (Exception ex)
+     {
+         Console.WriteLine(ex.Message);
+     }
+     finally
+     {
+         con.Close();
+     }
+     return quota;
+ }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //////////////Admin
+    ///////creat user
+    
+    public void creat_user(int userId, string passwordHash, string name, string email, string userType,
+                           string? officeRoom = null)
+    {
+    
+        string query = @"INSERT INTO [User] (UserID,[Password],[Name],Email,UserType)
+                             VALUES(@UserID,@Password,@UserName,@UserEmail,@UserType);
+    
+                             IF      @UserType = 'Professor'
+                                 INSERT INTO Professor (ID,OfficeRoom)
+                                 VALUES (@UserID, @OfficeRoom);
+                             ELSE IF @UserType = 'Student'
+                                 INSERT INTO Student (ID,Quota)
+                                 VALUES (@UserID, 3);
+                             ELSE IF @UserType = 'TA'
+                                 INSERT INTO TA (ID,OfficeRoom,Quota)
+                                 VALUES (@UserID, @OfficeRoom, 20);";
+        SqlCommand cmd = new SqlCommand(query, con);
+        cmd.Parameters.Add("@UserID", SqlDbType.Int).Value = userId;
+        cmd.Parameters.Add("@Password", SqlDbType.NVarChar, 200).Value = passwordHash; // already hashed outside
+        cmd.Parameters.Add("@UserName", SqlDbType.NVarChar, 100).Value = name;
+        cmd.Parameters.Add("@UserEmail", SqlDbType.NVarChar, 100).Value = email;
+        cmd.Parameters.Add("@UserType", SqlDbType.NVarChar, 20).Value = userType;
+        cmd.Parameters.Add("@OfficeRoom", SqlDbType.NVarChar, 20).Value = (object?)officeRoom ?? DBNull.Value;
+    
+    
+        try
+        {
+            con.Open();
+            cmd.ExecuteNonQuery();
+        }
+        catch (Exception ex) { Console.WriteLine(ex.Message); }
+        finally { con.Close(); }
+    
+    
+    }
+
+
+//stats of the admin////////////////
+
+    
+    public (int profs, int tas, int students, int handledBookings, int handledReports) Admin_stats()
+    {
+        /*  int profs, tas, students, handledBookings, handledReports;*/
+        string query = "SELECT\r\n  (SELECT COUNT(*) FROM Professor)                               AS NumProfessors,\r\n  (SELECT COUNT(*) FROM TA)                                      AS NumTAs,\r\n  (SELECT COUNT(*) FROM Student)                                 AS NumStudents,\r\n  (SELECT COUNT(*) FROM RequestOrReport\r\n    WHERE RType IN ('RoomBookingRequest','ClinicBookingRequest')\r\n      AND Condition = 'Handled')                                 AS HandledBookingReqs,\r\n  (SELECT COUNT(*) FROM RequestOrReport\r\n    WHERE RType = 'Report'\r\n      AND Condition = 'Handled')                                 AS HandledReports;";
+    
+    
+        SqlCommand cmd = new SqlCommand(query, con);
+        try
+        {
+            con.Open();
+            using var r = cmd.ExecuteReader();
+            if (!r.Read()) return (0, 0, 0, 0, 0);
+            return (r.GetInt32(0),
+           r.GetInt32(1),
+           r.GetInt32(2),
+           r.GetInt32(3),
+           r.GetInt32(4));
+        }
+        catch (Exception ex) { Console.WriteLine(ex.Message); throw; }
+        finally { con.Close(); }
+    
+    }
+
+
+     public void InsertSuppliesRequest(string email, DateTime expectedDelivery, string suppliesText)
+ {
+     
+ 
+     const string query = @"DECLARE @UserID INT = (SELECT u.UserID FROM[User] u WHERE u.Email = @Email);
+     DECLARE @RID    INT = ISNULL((SELECT MAX(RID) FROM RequestOrReport), 0) +1;
+
+     INSERT INTO RequestOrReport(RID, UserID, Condition, DayofR, HourofR, RType)
+     VALUES(@RID, @UserID, 'Pending', CAST(GETDATE() AS date), CAST(GETDATE() AS time), 'SuppliesRequest');
+
+     INSERT INTO SuppliesRequest (ID, ExpectedDeliveryDate, Supplies)
+     VALUES (@RID, @ExpectedDelivery, @SuppliesText);";
+
+
+
+     SqlCommand cmd = new SqlCommand(query, con);
+    
+
+     
+     cmd.Parameters.Add("@Email", SqlDbType.NVarChar, 100).Value = email;
+     cmd.Parameters.Add("@ExpectedDelivery", SqlDbType.Date).Value = expectedDelivery;
+     cmd.Parameters.Add("@SuppliesText", SqlDbType.NVarChar, -1).Value = suppliesText;
+     try
+     {
+         con.Open();
+         cmd.ExecuteNonQuery();
+     }
+     catch (Exception ex)
+     {
+         Console.WriteLine("Error in InsertSuppliesRequest: " + ex.Message);
+         throw;
+
+     }
+     finally { con.Close(); }
+     }
+
+
+        public Dictionary<string, int> getFavouriteCodeEditors()
+    {
+        // 1) Prepare an empty dictionary
+        var labelsAndCounts = new Dictionary<string, int>();
+
+        // 2) Build a UNION ALL query that returns (code_editor, count) rows
+        string query = @"
+  SELECT 'Professors'               AS code_editor, COUNT(*) AS count FROM Professor
+  UNION ALL
+  SELECT 'TAs'                      AS code_editor, COUNT(*) AS count FROM TA
+  UNION ALL
+  SELECT 'Students'                 AS code_editor, COUNT(*) AS count FROM Student
+  UNION ALL
+  SELECT 'HandledBookingRequests'   AS code_editor, COUNT(*) AS count
+    FROM RequestOrReport
+   WHERE RType IN ('RoomBookingRequest','ClinicBookingRequest')
+     AND Condition = 'Handled'
+  UNION ALL
+  SELECT 'HandledReports'           AS code_editor, COUNT(*) AS count
+    FROM RequestOrReport
+   WHERE RType = 'Report'
+     AND Condition = 'Handled';
+";
+
+        SqlCommand cmd = new SqlCommand(query, con);
+        try
+        {
+            con.Open();
+            using var reader = cmd.ExecuteReader();
+
+            // 3) Read each row and shove into your dictionary
+            while (reader.Read())
+            {
+                string label = reader.GetString(reader.GetOrdinal("code_editor"));
+                int cnt = reader.GetInt32(reader.GetOrdinal("count"));
+                labelsAndCounts[label] = cnt;
+            }
+        }
+        catch (Exception ex)
+        {
+            // bubble it up or log
+            Console.WriteLine(ex.Message);
+            throw;
+        }
+        finally
+        {
+            con.Close();
+        }
+
+        return labelsAndCounts;
+    }
+        
+
+ }
+
 
 
 }

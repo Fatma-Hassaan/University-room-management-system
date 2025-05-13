@@ -7,39 +7,34 @@ namespace Project.Pages.CleaningStaff
 {
     public class Cleaning_RequestsModel : PageModel
     {
-        public DB db { get; set; }
+        private readonly DB db;
+
         public DataTable CleaningRequestsTable { get; set; }
 
-        public Cleaning_RequestsModel()
+        [BindProperty]
+        public int SelectedRequestId { get; set; }
+
+        [BindProperty]
+        public string SelectedStatus { get; set; }
+
+        public Cleaning_RequestsModel(DB db)
         {
-            db = new DB(); 
+            this.db = db;
         }
 
-        public IActionResult OnGet()
+        public void OnGet()
         {
-            // Check if user is logged in
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserType")))
+            CleaningRequestsTable = db.LoadCleaningRequestsForStaff();
+        }
+
+        public IActionResult OnPostUpdateRequestStatus()
+        {
+            if (SelectedRequestId != 0 && !string.IsNullOrEmpty(SelectedStatus))
             {
-                // If not logged in, redirect to login page
-                return RedirectToPage("/Login");
+                db.UpdateCleaningRequestStatus(SelectedRequestId, SelectedStatus);
             }
 
-            // Otherwise, load the cleaning requests
-            CleaningRequestsTable = db.LoadCleaningRequests();
-
-            return Page();
+            return RedirectToPage();
         }
-
-
-        public IActionResult OnPostMarkAsDone(int requestId)
-        {
-            db.MarkCleaningRequestAsHandled(requestId);
-            return RedirectToPage(); // Refresh the list after marking
-        }
-
-        
-        
-        
     }
 }
-

@@ -10,46 +10,41 @@ namespace Project.Pages.CleaningStaff
         public DB db { get; set; }
 
         public DataTable DailyStatuses { get; set; } = new DataTable();
+        [BindProperty] public DateTime? SelectedDate { get; set; }
 
-        [BindProperty]
-        public string SelectedRoom { get; set; }
+        [BindProperty] public string SelectedRoom { get; set; }
 
-        [BindProperty]
-        public string SelectedCondition { get; set; }
-        
-      
-        public DataTable RoomCleaningTable { get; set; }
-
-        
+        [BindProperty] public string SelectedCondition { get; set; }
 
         public Daily_CleaningModel()
         {
-            db = new DB(); 
+            db = new DB();
         }
 
-        public IActionResult OnGet()
+        public void OnGet()
         {
-        
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserType")))
-            {
-                return RedirectToPage("/Login");
-            }
-            
             DailyStatuses = db.LoadDailyCleaningStatuses();
-            return Page();
-            
         }
 
-        public IActionResult OnPost()
-        {   
-            
+        public IActionResult OnPostUpdateStatus()
+        {
             if (!string.IsNullOrEmpty(SelectedRoom) && !string.IsNullOrEmpty(SelectedCondition))
             {
-                db.UpdateRoomCleaningStatus(SelectedRoom, SelectedCondition);
+                db.UpdateDailyCleaningStatus(SelectedRoom, SelectedCondition);
             }
-
-            DailyStatuses = db.LoadDailyCleaningStatuses();
+            // Apply date filter if present
+            DailyStatuses = db.LoadDailyCleaningStatuses(SelectedDate);
             return Page();
         }
+
+        public IActionResult OnPostFilterByDate()
+        {
+            DailyStatuses = db.LoadDailyCleaningStatuses(SelectedDate);
+            return Page();
+        }
+
+
+
+
     }
 }

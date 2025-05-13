@@ -1,60 +1,58 @@
 ﻿@page
-@model Project.Pages.RoomServicesTeam.CleaningRequestsModel
+@model Project.Pages.RoomServicesTeam.Cleaning_RequestModel
 @{
-    ViewData["Title"] = "Cleaning Requests";
-    ViewData["CustomNavbar"] = "RoomSearch";
+    ViewData["Title"] = "Submit Cleaning Request";
 }
 
-<div class="container mt-5">
-    <h3 class="mb-4">Cleaning Requests</h3>
+<h2>Submit a Cleaning Request</h2>
 
-    <!-- Cleaning Request Table -->
+<!-- Form to submit a new cleaning request -->
+<form method="post" asp-page-handler="SubmitCleaningRequest">
+    <div class="d-flex align-items-center mb-4">
+        <label class="me-2">Select Room:</label>
+        <select asp-for="SelectedRoomId" class="form-select w-25" required>
+            <option value="">-- Select Room --</option>
+            @foreach (var room in Model.RoomsList)
+            {
+                <option value="@room">@room</option>
+            }
+        </select>
+        <button type="submit" class="btn btn-primary ms-3">Request</button>
+    </div>
+</form>
+
+<!-- Table of all cleaning requests -->
+<h3>Cleaning Requests</h3>
+
+@if (Model.CleaningRequestsTable.Rows.Count == 0)
+{
+    <p>No cleaning requests found.</p>
+}
+else
+{
     <table class="table table-bordered">
-        <thead class="table-success">
+        <thead class="table-light">
         <tr>
-            <th>Request</th>
+            <th>Request ID</th>
             <th>Room ID</th>
-            <th>Time of Request</th>
             <th>Condition</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Requested By</th>
         </tr>
         </thead>
         <tbody>
-        @if (Model.RequestsTable.Rows.Count > 0)
-        {
-            int i = 1;
-            foreach (System.Data.DataRow row in Model.RequestsTable.Rows)
-            {
-                <tr>
-                    <td>Request @i</td>
-                    <td>@row["RoomID"]</td>
-                    <td>@Convert.ToDateTime(row["RequestTime"]).ToString("HH:mm")</td>
-                    <td>@row["Condition"]</td>
-                </tr>
-                i++;
-            }
-        }
-        else
+        @foreach (System.Data.DataRow row in Model.CleaningRequestsTable.Rows)
         {
             <tr>
-                <td colspan="4" class="text-center">No cleaning requests found.</td>
+                <td>@row["RID"]</td>
+                <td>@row["RoomID"]</td>
+                <td>@row["Condition"]</td>
+                <td>@Convert.ToDateTime(row["RequestDate"]).ToShortDateString()</td>
+                <td>@row["RequestTime"]</td>
+                <td>@row["RequestorName"]</td>
             </tr>
         }
         </tbody>
     </table>
-
-    <!-- New Request Form -->
-    <form method="post" asp-page-handler="NewRequest">
-        <div class="mt-4 d-flex align-items-center">
-            <label for="RoomID" class="me-2">Room</label>
-            <select id="RoomID" name="RoomID" class="form-select w-25 me-3">
-                @foreach (var room in Model.AvailableRooms)
-                {
-                    <option value="@room">@room</option>
-                }
-            </select>
-            <button type="submit" class="btn btn-primary">Request</button>
-        </div>
-    </form>
-</div>
-
-
+}
