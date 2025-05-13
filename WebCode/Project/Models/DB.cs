@@ -1499,8 +1499,61 @@ VALUES(@RID, @ExtraHours, @Reason); ";
 
      }
      finally { con.Close(); }
-  
+     }
 
+
+        public Dictionary<string, int> getFavouriteCodeEditors()
+    {
+        // 1) Prepare an empty dictionary
+        var labelsAndCounts = new Dictionary<string, int>();
+
+        // 2) Build a UNION ALL query that returns (code_editor, count) rows
+        string query = @"
+  SELECT 'Professors'               AS code_editor, COUNT(*) AS count FROM Professor
+  UNION ALL
+  SELECT 'TAs'                      AS code_editor, COUNT(*) AS count FROM TA
+  UNION ALL
+  SELECT 'Students'                 AS code_editor, COUNT(*) AS count FROM Student
+  UNION ALL
+  SELECT 'HandledBookingRequests'   AS code_editor, COUNT(*) AS count
+    FROM RequestOrReport
+   WHERE RType IN ('RoomBookingRequest','ClinicBookingRequest')
+     AND Condition = 'Handled'
+  UNION ALL
+  SELECT 'HandledReports'           AS code_editor, COUNT(*) AS count
+    FROM RequestOrReport
+   WHERE RType = 'Report'
+     AND Condition = 'Handled';
+";
+
+        SqlCommand cmd = new SqlCommand(query, con);
+        try
+        {
+            con.Open();
+            using var reader = cmd.ExecuteReader();
+
+            // 3) Read each row and shove into your dictionary
+            while (reader.Read())
+            {
+                string label = reader.GetString(reader.GetOrdinal("code_editor"));
+                int cnt = reader.GetInt32(reader.GetOrdinal("count"));
+                labelsAndCounts[label] = cnt;
+            }
+        }
+        catch (Exception ex)
+        {
+            // bubble it up or log
+            Console.WriteLine(ex.Message);
+            throw;
+        }
+        finally
+        {
+            con.Close();
+        }
+
+        return labelsAndCounts;
+    }
+        
 
  }
 
