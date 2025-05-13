@@ -2,53 +2,72 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Project.Models;
 using Project.Pages.TA;
+using System.Data;
 
 namespace Project.Pages.Professor
 {
     public class My_RoomsModel : PageModel
     {
-        public DB db { get; set; }
-        public My_RoomsModel(DB db)
-        {
-            this.db = db;
-        }
-        public List<Course> Courses { get; set; }
-        public List<RoomChangeRequest> ChangeRequests { get; set; }
-        public IActionResult OnGet()
-        {
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserType")))
-            {
-                return RedirectToPage("/Login");
-            }
-            else
-            {
-                Courses = new List<Course>
-            {
-                new Course { Id = 1, CourseCode = "CIE101", CourseName = "Intro to Infrastructure", RoomNumber = "B202", TimeSlot = "Sun 10:00–12:00" },
-                new Course { Id = 2, CourseCode = "CIE102", CourseName = "Construction Materials", RoomNumber = "A103", TimeSlot = "Tue 14:00–16:00" }
-            };
+        private readonly DB _db;
 
-                ChangeRequests = new List<RoomChangeRequest>
+        public My_RoomsModel()
+        {
+            _db = new DB();
+        }
+
+        public List<Course> Courses { get; set; } = new List<Course>();
+        public List<ChangeRequest> ChangeRequests { get; set; } = new List<ChangeRequest>();
+
+        public void OnGet()
+        {
+            
+            var professorId = int.Parse(User.FindFirst("ProfessorId").Value);
+
+            
+            DataTable coursesDt = _db.GetProfessorCourses(professorId);
+            foreach (DataRow row in coursesDt.Rows)
             {
-                new RoomChangeRequest { CourseCode = "CIE101", NewRoom = "B205", Reason = "Projector not working" }
-            };
-                return Page();
+                Courses.Add(new Course
+                {
+                    CourseCode = row["CourseCode"].ToString(),
+                    CourseName = row["CourseName"].ToString(),
+                    CurrentRoom = row["CurrentRoom"].ToString(),
+                    Building = row["Building"].ToString(),
+                    Schedule = $"{row["LectureDay"]} {row["StartTime"]} - {row["EndTime"]}"
+                });
+            }
+
+            // Load change requests
+            DataTable requestsDt = _db.GetProfessorChangeRequests(professorId);
+            foreach (DataRow row in requestsDt.Rows)
+            {
+                ChangeRequests.Add(new ChangeRequest
+                {
+                    CourseCode = row["CourseCode"].ToString(),
+                    RequestedRoom = row["NewRoom"].ToString(),
+                    Reason = row["Reason"].ToString(),
+                    RequestID = (int)row["RequestId"]
+                });
             }
         }
-    }
-    public class Course
-    {
-        public int Id { get; set; }
-        public string CourseCode { get; set; }
-        public string CourseName { get; set; }
-        public string RoomNumber { get; set; }
-        public string TimeSlot { get; set; }
-    }
 
-    public class RoomChangeRequest
-    {
-        public string CourseCode { get; set; }
-        public string NewRoom { get; set; }
-        public string Reason { get; set; }
+        
+        public class Course
+        {
+            public string CourseCode { get; set; }
+            public string CourseName { get; set; }
+            public string CurrentRoom { get; set; }
+            public string Building { get; set; }
+            public string Schedule { get; set; }
+            public string RoomNumber => $"{Building} {CurrentRoom}";
+        }
+
+        public class ChangeRequest
+        {
+            public string CourseCode { get; set; }
+            public string RequestedRoom { get; set; }
+            public string Reason { get; set; }
+            public int RequestID { get; set; }
+        }
     }
 }

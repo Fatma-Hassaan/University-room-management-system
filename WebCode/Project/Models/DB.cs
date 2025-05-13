@@ -682,6 +682,73 @@ namespace Project.Models
             }
             return result;
         }
+
+        public DataTable GetProfessorCourses(int professorId)
+        {
+            DataTable dt = new DataTable();
+            string query = @"
+                SELECT 
+                    c.Code AS CourseCode,
+                    c.Name AS CourseName,
+                    c.LectureRoom AS CurrentRoom,
+                    (SELECT Building FROM Room WHERE ID = c.LectureRoom) AS Building,
+                    CONVERT(varchar, c.LectureHour, 108) AS StartTime,
+                    CONVERT(varchar, DATEADD(MINUTE, c.LectureDuration, c.LectureHour), 108) AS EndTime,
+            c.LectureDay AS LectureDay
+            FROM Course c
+            WHERE c.ProfessorID = @ProfessorId;";
+    
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@ProfessorId", professorId);
+    
+             try
+             {
+             con.Open();
+             dt.Load(cmd.ExecuteReader());
+            }
+            catch (Exception ex)
+            {
+            // Handle error
+            }
+            finally
+            {
+            con.Close();
+            }
+            return dt;
+        }
+
+        public DataTable GetProfessorChangeRequests(int professorId)
+        {
+         DataTable dt = new DataTable();
+         string query = @"SELECT 
+            c.Code AS CourseCode,
+            r.ID AS NewRoom,
+            rc.Reason,
+            rr.RID AS RequestId
+            FROM RoomChangeRequest rc
+            JOIN RequestOrReport rr ON rc.ID = rr.RID
+            JOIN Course c ON rc.CourseCode = c.Code
+            JOIN Room r ON rc.NewRoomID = r.ID
+            WHERE c.ProfessorID = @ProfessorId 
+            AND rr.Condition = 'Pending';";
+            
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@ProfessorId", professorId);
+            try
+            {
+                con.Open();
+                dt.Load(cmd.ExecuteReader());
+                }
+                catch (Exception ex)
+                {// Handle error
+                }
+                finally
+                {
+                    con.Close();
+                }
+                    return dt;
+        }
+           
     }
     
 
