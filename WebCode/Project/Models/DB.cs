@@ -272,6 +272,37 @@ namespace Project.Models
 
             return dt;
         }
+          public DataTable LoadCleaningRequestsForStaff()
+        {
+            string query = @"
+        SELECT 
+            rr.RID AS ID,
+            cr.RoomID,
+            u.Name AS RequestorName,
+            rr.DayofR AS RequestDate,
+            rr.HourofR AS RequestTime,
+            rr.Condition
+        FROM RequestOrReport rr
+        JOIN CleaningRequest cr ON rr.RID = cr.ID
+        JOIN [User] u ON rr.UserID = u.UserID
+        WHERE rr.Condition IN ('Pending', 'In progress')
+        ORDER BY rr.DayofR DESC, rr.HourofR DESC;";
+
+            SqlCommand cmd = new SqlCommand(query, con);
+            DataTable dt = new DataTable();
+
+            try
+            {
+                con.Open();
+                dt.Load(cmd.ExecuteReader());
+            }
+            finally
+            {
+                con.Close();
+            }
+
+            return dt;
+        }
 
         public DataTable LoadDailyCleaningStatuses()
         {
@@ -295,21 +326,23 @@ namespace Project.Models
             return dt;
         }
 
-        public void UpdateRoomCleaningStatus(string roomId, string condition)
+        public void UpdateCleaningRequestStatus(int requestId, string status)
         {
-            string query = "UPDATE CleaningRequest SET Condition = @Condition WHERE RoomID = @RoomID";
+            string query = @"
+        UPDATE RequestOrReport
+        SET Condition = @Condition,
+            DayofHandling = CAST(GETDATE() AS DATE),
+            HourofHandling = CAST(GETDATE() AS TIME)
+        WHERE RID = @RID AND RType = 'CleaningRequest';";
+
             SqlCommand cmd = new SqlCommand(query, con);
-            cmd.Parameters.AddWithValue("@Condition", condition);
-            cmd.Parameters.AddWithValue("@RoomID", roomId);
+            cmd.Parameters.AddWithValue("@RID", requestId);
+            cmd.Parameters.AddWithValue("@Condition", status);
 
             try
             {
                 con.Open();
                 cmd.ExecuteNonQuery();
-            }
-            catch (Exception ex)
-            {
-                // Optionally log
             }
             finally
             {
