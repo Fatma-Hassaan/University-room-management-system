@@ -89,45 +89,78 @@ namespace Project.Models
             }
         }
 
-        public DataTable LoadAllCleaningRequests()
+       public DataTable LoadAllCleaningRequestsForRoomServices()
         {
-            string query = "SELECT * FROM RequestToReport WHERE Type = 'Cleaning' ORDER BY RequestDate DESC, RequestTime DESC";
-            SqlCommand cmd = new SqlCommand(query, con);
             DataTable dt = new DataTable();
-            try
+
+            string query = @"
+              SELECT 
+                rr.RID,
+                cr.RoomID,
+                rr.Condition,
+                rr.DayofR AS RequestDate,
+                rr.HourofR AS RequestTime,
+                u.Name AS RequestorName
+            FROM CleaningRequest cr
+            JOIN RequestOrReport rr ON cr.ID = rr.RID
+            JOIN [User] u ON rr.UserID = u.UserID
+            WHERE rr.RType = 'CleaningRequest'
+            ORDER BY rr.DayofR DESC, rr.HourofR DESC;
+            
+            ";
+
+            using (SqlCommand cmd = new SqlCommand(query, con))
             {
-                con.Open();
-                dt.Load(cmd.ExecuteReader());
+                try
+                {
+                    con.Open();
+                    dt.Load(cmd.ExecuteReader());
+                }
+                finally
+                {
+                    con.Close();
+                }
             }
-            finally
-            {
-                con.Close();
-            }
+
             return dt;
         }
 
-        public void InsertCleaningRequest(int userId, string roomId)
+
+      public void InsertCleaningRequest(int userId, string roomId)
         {
-            string query = "INSERT INTO RequestToReport (UserID, RoomID, Type, Condition, RequestDate, RequestTime) " +
-                           "VALUES (@UserID, @RoomID, 'Cleaning', 'Undone', GETDATE(), GETDATE())";
-            SqlCommand cmd = new SqlCommand(query, con);
-            cmd.Parameters.AddWithValue("@UserID", userId);
-            cmd.Parameters.AddWithValue("@RoomID", roomId);
-            try
+            string insertMain = @"
+        INSERT INTO RequestOrReport (RID, UserID, Condition, DayofR, HourofR, RType)
+        VALUES ((SELECT ISNULL(MAX(RID), 0) + 1 FROM RequestOrReport), @UserID, 'Pending', CAST(GETDATE() AS DATE), CAST(GETDATE() AS TIME), 'CleaningRequest');
+        DECLARE @NewRID INT = (SELECT MAX(RID) FROM RequestOrReport);
+        INSERT INTO CleaningRequest (ID, RoomID) VALUES (@NewRID, @RoomID);
+    ";
+
+            using (SqlCommand cmd = new SqlCommand(insertMain, con))
             {
-                con.Open();
-                cmd.ExecuteNonQuery();
-            }
-            finally
-            {
-                con.Close();
+                cmd.Parameters.AddWithValue("@UserID", userId);
+                cmd.Parameters.AddWithValue("@RoomID", roomId);
+                try
+                {
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("InsertCleaningRequest Error: " + ex.Message);
+                }
+                finally
+                {
+                    con.Close();
+                }
             }
         }
+
+
 
         public List<string> GetAvailableRoomIDs()
         {
             var list = new List<string>();
-            string query = "SELECT ID FROM Room"; // Adjust if needed
+            string query = "SELECT ID FROM Room"; 
             SqlCommand cmd = new SqlCommand(query, con);
             try
             {
