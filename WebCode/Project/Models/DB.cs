@@ -284,14 +284,26 @@ namespace Project.Models
             finally { con.Close(); }
         }
 
-        public DataTable LoadAllReports()
+              public DataTable LoadAllReports()
         {
             DataTable dt = new DataTable();
-            string query = @"SELECT rr.ID, rr.RoomID, rr.Type, rr.Condition, rr.RequestDate, rr.RequestTime, u.Name AS RequestorName
-                     FROM RequestToReport rr
-                     JOIN [User] u ON rr.UserID = u.UserID
-                     WHERE rr.Condition IN ('Pending', 'In Progress')
-                     ORDER BY rr.RequestDate DESC, rr.RequestTime DESC";
+            string query = @"
+        SELECT 
+            r.ID,
+            cr.RoomID, 
+            rr.Condition,
+            rr.DayofR AS RequestDate, 
+            rr.HourofR AS RequestTime,
+            u.Name AS RequestorName,
+            r.Complaint  -- Complaint field from the Report table
+        FROM Report cr
+        JOIN RequestOrReport rr ON cr.ID = rr.RID
+        JOIN [User] u ON rr.UserID = u.UserID
+        LEFT JOIN Report r ON cr.RoomID = r.RoomID  -- Use RoomID for the join with the Report table
+        WHERE rr.Condition IN ('Pending', 'In Progress') 
+            AND rr.RType = 'Report'
+        ORDER BY rr.DayofR DESC, rr.HourofR DESC;
+    ";
 
             SqlCommand cmd = new SqlCommand(query, con);
             try
@@ -299,9 +311,15 @@ namespace Project.Models
                 con.Open();
                 dt.Load(cmd.ExecuteReader());
             }
-            catch (Exception ex) { }
-            finally { con.Close(); }
-
+            catch (Exception ex)
+            {
+                // Optionally log the error
+                Console.WriteLine("Error: " + ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
             return dt;
         }
           public DataTable LoadCleaningRequestsForStaff()
