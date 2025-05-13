@@ -446,6 +446,38 @@ namespace Project.Models
             }
         }
 
+           public DataTable LoadDailyCleaningForRoomServices(DateTime date)
+        {
+            DataTable dt = new DataTable();
+            string query = @"
+        SELECT 
+            cr.RoomID, 
+            rr.Condition, 
+            rr.DayofR AS RequestDate
+        FROM CleaningRequest cr
+        JOIN RequestOrReport rr ON cr.ID = rr.RID
+        WHERE rr.RType = 'CleaningRequest'
+        AND rr.DayofR = @Date";
+
+            using (SqlCommand cmd = new SqlCommand(query, con))
+            {
+                cmd.Parameters.AddWithValue("@Date", date.Date);
+                try
+                {
+                    con.Open();
+                    dt.Load(cmd.ExecuteReader());
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: " + ex.Message);
+                }
+                finally
+                {
+                    con.Close();
+                }
+            }
+            return dt;
+        }
 
 
         public string GetUserType(string Email)
