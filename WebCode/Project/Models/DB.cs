@@ -303,13 +303,25 @@ namespace Project.Models
 
             return dt;
         }
-
-        public DataTable LoadDailyCleaningStatuses()
+          public DataTable LoadDailyCleaningStatuses(DateTime? dateFilter = null)
         {
             DataTable dt = new DataTable();
-            string query = "SELECT RoomID, Condition FROM CleaningRequest";
+
+            string query = @"
+              SELECT
+            cr.RoomID,
+            rr.Condition
+        FROM CleaningRequest cr
+        JOIN RequestOrReport rr ON cr.ID = rr.RID
+        WHERE rr.RType = 'CleaningRequest'
+          AND rr.Condition IN ('Pending', 'In progress')
+          AND   rr.DayofR = @SelectedDate
+        ORDER BY cr.RoomID;
+            ";
 
             SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@SelectedDate", (object?)dateFilter ?? DBNull.Value);
+
             try
             {
                 con.Open();
@@ -317,12 +329,13 @@ namespace Project.Models
             }
             catch (Exception ex)
             {
-                // Optionally log
+                Console.WriteLine("Error loading filtered statuses: " + ex.Message);
             }
             finally
             {
                 con.Close();
             }
+
             return dt;
         }
 
@@ -349,7 +362,36 @@ namespace Project.Models
                 con.Close();
             }
         }
+        
+     public void UpdateDailyCleaningStatus(string roomId, string condition)
+        {
+            string query = @"
+        UPDATE rr
+        SET rr.Condition = @Condition,
+            rr.DayofHandling = CAST(GETDATE() AS DATE),
+            rr.HourofHandling = CAST(GETDATE() AS TIME)
+        FROM RequestOrReport rr
+        JOIN CleaningRequest cr ON rr.RID = cr.ID
+        WHERE cr.RoomID = @RoomID";
 
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.AddWithValue("@Condition", condition);
+            cmd.Parameters.AddWithValue("@RoomID", roomId);
+
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error updating status: " + ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
+        }
 
         public DataTable LoadCleaningRequests()
         {
