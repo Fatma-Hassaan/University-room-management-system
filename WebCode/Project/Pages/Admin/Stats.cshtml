@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model Project.Pages.Admin.StatsModel
 @{
     Layout = "_Layout";
@@ -6,10 +6,17 @@
 }
  
  
- 
+
+
+
 <h2>System Statistics</h2>
- 
-<div class="row g-3 mt-2">
+
+<div class="chart-container" style="max-width:600px; margin:0 auto;">
+    <!-- Change the id to match your pie chart -->
+    <canvas id="pieChart" width="600" height="400"></canvas>
+</div>
+
+<div class="row g-3 mt-4">
     <div class="col-sm-6">
         <label class="form-label">Number of Professors</label>
         <input asp-for="ProfessorsCount" class="form-control" readonly />
@@ -31,3 +38,25 @@
         <input asp-for="HandledReports" class="form-control" readonly />
     </div>
 </div>
+
+@section Scripts {
+    <!-- 1) Load Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- 2) Render the Doughnut charts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // User Distribution Chart
+            var userCtx = document.getElementById('userDistributionChart').getContext('2d');
+            var userConfig = @Html.Raw(Model.UserDistributionChartJson);
+            new Chart(userCtx, userConfig);
+
+            // Request Status Chart
+            var requestCtx = document.getElementById('requestStatusChart').getContext('2d');
+            var requestConfig = @Html.Raw(Model.RequestStatusChartJson);
+            new Chart(requestCtx, requestConfig);
+        });
+    </script>
+
+
+}
