@@ -3,43 +3,61 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Project.Models;
 using System.Data;
 
-namespace Project.Pages.CleaningStaff
+namespace Project.Pages.RoomServicesTeam
 {
-    public class Cleaning_RequestsModel : PageModel
+    public class Cleaning_RequestModel : PageModel
     {
-        public DB db { get; set; }
-        public DataTable CleaningRequestsTable { get; set; }
+        private readonly DB db;
 
-        public Cleaning_RequestsModel()
+        [BindProperty]
+        public string SelectedRoomId { get; set; }
+
+        public List<string> RoomsList { get; set; } = new List<string>();
+        public DataTable CleaningRequestsTable { get; set; } = new DataTable();
+
+        public int CurrentUserId => 
+            string.IsNullOrEmpty(HttpContext.Session.GetString("Email")) 
+                ? 0 
+              : db.GetUserID(HttpContext.Session.GetString("Email"));
+
+        public Cleaning_RequestModel(DB db)
         {
-            db = new DB(); 
+            this.db = db;
         }
 
         public IActionResult OnGet()
         {
-            // Check if user is logged in
-            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserType")))
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("UserType")) ||
+                HttpContext.Session.GetString("UserType") != "RoomServicesMember")
             {
-                // If not logged in, redirect to login page
                 return RedirectToPage("/Login");
             }
 
-            // Otherwise, load the cleaning requests
-            CleaningRequestsTable = db.LoadCleaningRequests();
+            RoomsList = db.GetAvailableRoomIDs();
+            CleaningRequestsTable = db.LoadAllCleaningRequestsForRoomServices();
 
             return Page();
         }
+       
 
+       public IActionResult OnPostSubmitCleaningRequest()
+       {
+           
+           Console.WriteLine("Selected Room: " + SelectedRoomId);
+           Console.WriteLine("Current User ID: " + CurrentUserId);
 
-        public IActionResult OnPostMarkAsDone(int requestId)
-        {
-            db.MarkCleaningRequestAsHandled(requestId);
-            return RedirectToPage(); // Refresh the list after marking
-        }
+           if (!string.IsNullOrEmpty(SelectedRoomId) && CurrentUserId != 0)
+           {
+               db.InsertCleaningRequest(CurrentUserId, SelectedRoomId);
+               Console.WriteLine("InsertCleaningRequest called successfully.");
+           }
+           else
+           {
+               Console.WriteLine("Request NOT inserted. Either room ID is missing or user ID is 0.");
+           }
 
-        
-        
-        
+           return RedirectToPage(); // Reload and reflect updated data
+       }
+
     }
 }
-
