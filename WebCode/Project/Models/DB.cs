@@ -1307,4 +1307,203 @@ namespace Project.Models
     }
 
 
+
+
+
+
+
+ //student#
+ public int student_quota(string email)
+ {
+     int quota = 0;
+     string query = "\r\nSELECT Quota\r\nFROM   Student S\r\ninner Join [User] As u on u.UserID =S.ID\r\nWHere u.Email= @Email;";
+     SqlCommand cmd = new SqlCommand(query, con);
+     cmd.Parameters.Add("@Email", SqlDbType.NVarChar, 100).Value = email;
+
+     try
+     {
+         con.Open();
+         quota = (int)cmd.ExecuteScalar();
+     }
+     catch (Exception ex)
+     {
+         Console.WriteLine(ex.Message);
+     }
+     finally
+     {
+         con.Close();
+     }
+     return quota;
+ }
+
+
+
+        public void insert_extra_hours_quota(string email, int hours_extra,string reason)
+        {
+            string query = @"DECLARE @UserID INT = (SELECT u.UserID FROM[User] u WHERE u.Email = @Email);
+            DECLARE @RID    INT = ISNULL((SELECT MAX(RID) FROM RequestOrReport), 0) +1;
+
+            INSERT INTO RequestOrReport(RID, UserID, Condition, DayofR, HourofR, RType)
+VALUES(@RID, @UserID, 'Pending', CAST(GETDATE() AS date), CAST(GETDATE() AS time), 'AdditionalQuotaRequest');
+
+            INSERT INTO AdditionalQuotaRequest(ID, NumOfExtraHours, reason)
+VALUES(@RID, @ExtraHours, @Reason); ";
+
+
+            SqlCommand cmd = new SqlCommand(query, con);
+            cmd.Parameters.Add("@Email", SqlDbType.NVarChar, 100).Value = email;
+            cmd.Parameters.Add("@ExtraHours", SqlDbType.Int).Value = hours_extra;
+            cmd.Parameters.Add("@Reason", SqlDbType.NVarChar, 255).Value = reason;
+
+            try
+            {
+                con.Open();
+                cmd.ExecuteNonQuery();
+                
+            }
+            catch (Exception ex) { Console.WriteLine(ex.Message); }
+            finally { con.Close(); }
+
+
+        }
+
+
+
+ ////////////////////////////////////////////////////////////////////////////////////////////
+ ///TA///////////////////
+ ///
+
+ public int TA_quota(string email)
+ {
+     int quota = 0;
+     string query = "\r\nSELECT Quota\r\nFROM   TA S\r\ninner Join [User] As u on u.UserID =S.ID\r\nWHere u.Email= @Email;";
+     SqlCommand cmd = new SqlCommand(query, con);
+     cmd.Parameters.Add("@Email", SqlDbType.NVarChar, 100).Value = email;
+
+     try
+     {
+         con.Open();
+         quota = (int)cmd.ExecuteScalar();
+     }
+     catch (Exception ex)
+     {
+         Console.WriteLine(ex.Message);
+     }
+     finally
+     {
+         con.Close();
+     }
+     return quota;
+ }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////
+    //////////////Admin
+    ///////creat user
+    
+    public void creat_user(int userId, string passwordHash, string name, string email, string userType,
+                           string? officeRoom = null)
+    {
+    
+        string query = @"INSERT INTO [User] (UserID,[Password],[Name],Email,UserType)
+                             VALUES(@UserID,@Password,@UserName,@UserEmail,@UserType);
+    
+                             IF      @UserType = 'Professor'
+                                 INSERT INTO Professor (ID,OfficeRoom)
+                                 VALUES (@UserID, @OfficeRoom);
+                             ELSE IF @UserType = 'Student'
+                                 INSERT INTO Student (ID,Quota)
+                                 VALUES (@UserID, 3);
+                             ELSE IF @UserType = 'TA'
+                                 INSERT INTO TA (ID,OfficeRoom,Quota)
+                                 VALUES (@UserID, @OfficeRoom, 20);";
+        SqlCommand cmd = new SqlCommand(query, con);
+        cmd.Parameters.Add("@UserID", SqlDbType.Int).Value = userId;
+        cmd.Parameters.Add("@Password", SqlDbType.NVarChar, 200).Value = passwordHash; // already hashed outside
+        cmd.Parameters.Add("@UserName", SqlDbType.NVarChar, 100).Value = name;
+        cmd.Parameters.Add("@UserEmail", SqlDbType.NVarChar, 100).Value = email;
+        cmd.Parameters.Add("@UserType", SqlDbType.NVarChar, 20).Value = userType;
+        cmd.Parameters.Add("@OfficeRoom", SqlDbType.NVarChar, 20).Value = (object?)officeRoom ?? DBNull.Value;
+    
+    
+        try
+        {
+            con.Open();
+            cmd.ExecuteNonQuery();
+        }
+        catch (Exception ex) { Console.WriteLine(ex.Message); }
+        finally { con.Close(); }
+    
+    
+    }
+
+
+//stats of the admin////////////////
+
+    
+    public (int profs, int tas, int students, int handledBookings, int handledReports) Admin_stats()
+    {
+        /*  int profs, tas, students, handledBookings, handledReports;*/
+        string query = "SELECT\r\n  (SELECT COUNT(*) FROM Professor)                               AS NumProfessors,\r\n  (SELECT COUNT(*) FROM TA)                                      AS NumTAs,\r\n  (SELECT COUNT(*) FROM Student)                                 AS NumStudents,\r\n  (SELECT COUNT(*) FROM RequestOrReport\r\n    WHERE RType IN ('RoomBookingRequest','ClinicBookingRequest')\r\n      AND Condition = 'Handled')                                 AS HandledBookingReqs,\r\n  (SELECT COUNT(*) FROM RequestOrReport\r\n    WHERE RType = 'Report'\r\n      AND Condition = 'Handled')                                 AS HandledReports;";
+    
+    
+        SqlCommand cmd = new SqlCommand(query, con);
+        try
+        {
+            con.Open();
+            using var r = cmd.ExecuteReader();
+            if (!r.Read()) return (0, 0, 0, 0, 0);
+            return (r.GetInt32(0),
+           r.GetInt32(1),
+           r.GetInt32(2),
+           r.GetInt32(3),
+           r.GetInt32(4));
+        }
+        catch (Exception ex) { Console.WriteLine(ex.Message); throw; }
+        finally { con.Close(); }
+    
+    }
+
+
+     public void InsertSuppliesRequest(string email, DateTime expectedDelivery, string suppliesText)
+ {
+     
+ 
+     const string query = @"DECLARE @UserID INT = (SELECT u.UserID FROM[User] u WHERE u.Email = @Email);
+     DECLARE @RID    INT = ISNULL((SELECT MAX(RID) FROM RequestOrReport), 0) +1;
+
+     INSERT INTO RequestOrReport(RID, UserID, Condition, DayofR, HourofR, RType)
+     VALUES(@RID, @UserID, 'Pending', CAST(GETDATE() AS date), CAST(GETDATE() AS time), 'SuppliesRequest');
+
+     INSERT INTO SuppliesRequest (ID, ExpectedDeliveryDate, Supplies)
+     VALUES (@RID, @ExpectedDelivery, @SuppliesText);";
+
+
+
+     SqlCommand cmd = new SqlCommand(query, con);
+    
+
+     
+     cmd.Parameters.Add("@Email", SqlDbType.NVarChar, 100).Value = email;
+     cmd.Parameters.Add("@ExpectedDelivery", SqlDbType.Date).Value = expectedDelivery;
+     cmd.Parameters.Add("@SuppliesText", SqlDbType.NVarChar, -1).Value = suppliesText;
+     try
+     {
+         con.Open();
+         cmd.ExecuteNonQuery();
+     }
+     catch (Exception ex)
+     {
+         Console.WriteLine("Error in InsertSuppliesRequest: " + ex.Message);
+         throw;
+
+     }
+     finally { con.Close(); }
+  
+
+
+ }
+
+
+
 }
