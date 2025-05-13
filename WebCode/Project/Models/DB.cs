@@ -683,6 +683,9 @@ namespace Project.Models
             return result;
         }
 
+
+        // updated prof queries 
+
         public DataTable GetProfessorCourses(int professorId)
         {
             DataTable dt = new DataTable();
@@ -1083,7 +1086,7 @@ namespace Project.Models
             }
             return dt;
         }
-        
+
         public int GetTARemainingQuota(int taId)
         {
             string query = @"
