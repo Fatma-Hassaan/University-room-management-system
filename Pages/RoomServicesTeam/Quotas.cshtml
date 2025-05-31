@@ -1,0 +1,60 @@
+﻿@page
+@model Project.Pages.RoomServicesTeam.QuotaModel
+@{
+    ViewData["Title"] = "Quota Requests";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h4 class="mb-0">Quota Requests</h4>
+        </div>
+        <div class="card-body">
+
+            @if (Model.QuotaRequestsTable.Rows.Count == 0)
+            {
+                <p class="text-muted">No quota requests found.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Request ID</th>
+                                <th>User ID</th>
+                                <th>User Type</th>
+                                <th>Extra Hours</th>
+                                <th>Reason</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (System.Data.DataRow row in Model.QuotaRequestsTable.Rows)
+                            {
+                                <tr>
+                                    <td>@row["ID"]</td>
+                                    <td>@row["UserID"]</td>
+                                    <td>@row["UserType"]</td>
+                                    <td>@row["ExtraHours"]</td>
+                                    <td>@row["Reason"]</td>
+                                    <td>
+                                        <form method="post" asp-page-handler="UpdateStatus" class="d-flex align-items-center gap-2">
+                                            <input type="hidden" name="SelectedRequestId" value="@row["ID"]" />
+                                            <select asp-for="SelectedStatus" class="form-select w-auto" required>
+                                                <option value="Approved">Approve</option>
+                                                <option value="Declined">Reject</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-success">Update</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

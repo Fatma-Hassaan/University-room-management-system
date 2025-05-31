@@ -1,0 +1,81 @@
+﻿@page
+@model Project.Pages.CleaningStaff.DailyCleaningModel
+@{
+    ViewData["Title"] = "Daily Cleaning";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h4 class="mb-0">Daily Cleaning Tasks</h4>
+        </div>
+        <div class="card-body">
+
+            <!-- Date Filter -->
+            <form method="post" asp-page-handler="FilterByDate" class="row align-items-end mb-4">
+                <div class="col-md-4">
+                    <label asp-for="SelectedDate" class="form-label">Filter by Date</label>
+                    <input asp-for="SelectedDate" type="date" class="form-control" />
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-outline-primary mt-3 mt-md-0">Filter</button>
+                </div>
+            </form>
+
+            @if (Model.DailyStatuses.Rows.Count == 0)
+            {
+                <p class="text-muted">No cleaning tasks found for the selected date.</p>
+            }
+            else
+            {
+                <!-- Status Update Form -->
+                <form method="post" asp-page-handler="UpdateStatus" class="row align-items-end mb-4">
+                    <div class="col-md-4">
+                        <label asp-for="SelectedRoom" class="form-label">Room</label>
+                        <select asp-for="SelectedRoom" class="form-select" required>
+                            <option value="">Select a Room</option>
+                            @foreach (System.Data.DataRow row in Model.DailyStatuses.Rows)
+                            {
+                                <option value="@row["RoomID"]">@row["RoomID"]</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="SelectedCondition" class="form-label">New Condition</label>
+                        <select asp-for="SelectedCondition" class="form-select" required>
+                            <option value="In progress">In Progress</option>
+                            <option value="Handled">Done</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2 d-grid">
+                        <button type="submit" class="btn btn-success mt-3 mt-md-0">Set</button>
+                    </div>
+                </form>
+
+                <!-- Tasks Table -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Room ID</th>
+                                <th>Condition</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (System.Data.DataRow row in Model.DailyStatuses.Rows)
+                            {
+                                <tr>
+                                    <td>@row["RoomID"]</td>
+                                    <td>@row["Condition"]</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

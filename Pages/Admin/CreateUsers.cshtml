@@ -1,0 +1,108 @@
+﻿@page
+@model Project.Pages.Admin.Create_UsersModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Create User";
+}
+
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>Create User</h2>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    @if (TempData["SuccessMessage"] is string successMsg)
+    {
+        <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+            @successMsg
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- User Form -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">User Details</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <div class="mb-3 row">
+                    <label asp-for="UserName" class="col-sm-3 col-form-label">User Name</label>
+                    <div class="col-sm-9">
+                        <input asp-for="UserName" class="form-control" />
+                        <span asp-validation-for="UserName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label asp-for="UserId" class="col-sm-3 col-form-label">User ID</label>
+                    <div class="col-sm-9">
+                        <input asp-for="UserId" class="form-control" />
+                        <span asp-validation-for="UserId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label asp-for="Email" class="col-sm-3 col-form-label">User Email</label>
+                    <div class="col-sm-9">
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3 row">
+                    <label asp-for="Password" class="col-sm-3 col-form-label">User Password</label>
+                    <div class="col-sm-9">
+                        <input asp-for="Password" class="form-control" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4 row">
+                    <label asp-for="Type" class="col-sm-3 col-form-label">Type</label>
+                    <div class="col-sm-9">
+                        <select asp-for="Type" asp-items="Model.UserTypes" class="form-control">
+                            <option value="">-- select type --</option>
+                        </select>
+                        <span asp-validation-for="Type" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-custom btn-lg">Create User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    .card-header {
+        background-color: #f8f9fa;
+    }
+
+    .card h5 {
+        margin-bottom: 0;
+    }
+
+    dt {
+        font-weight: 500;
+    }
+
+    .btn-custom {
+        background-color: #4b6584; /* A soft dark blue-gray */
+        color: white;
+        border: none;
+    }
+
+        .btn-custom:hover {
+            background-color: #3b4f68;
+        }
+</style>

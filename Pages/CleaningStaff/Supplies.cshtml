@@ -1,0 +1,69 @@
+﻿@page
+@model Project.Pages.CleaningStaff.SuppliesModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Supplies Request";
+}
+
+<div class="container mt-4">
+
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>@ViewData["Title"]</h2>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Request Form Card -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Request Cleaning Supplies</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <div class="row mb-3">
+                    <label asp-for="Supplies" class="col-sm-3 col-form-label">Supplies</label>
+                    <div class="col-sm-9">
+                        <input asp-for="Supplies" class="form-control" />
+                        <span asp-validation-for="Supplies" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <label asp-for="ExpectedDeliveryTime" class="col-sm-3 col-form-label">Expected Delivery Time</label>
+                    <div class="col-sm-9">
+                        <input asp-for="ExpectedDeliveryTime" type="datetime-local" class="form-control" />
+                        <span asp-validation-for="ExpectedDeliveryTime" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-dark btn-lg">Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    .card-header {
+        background-color: #f8f9fa;
+    }
+
+    dt {
+        font-weight: 500;
+    }
+</style>

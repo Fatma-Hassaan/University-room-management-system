@@ -1,0 +1,80 @@
+﻿@page
+@model Project.Pages.RoomServicesTeam.ReportsModel
+@{
+    ViewData["Title"] = "Reports";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h4 class="mb-0">Cleaning Reports with Complaints</h4>
+        </div>
+        <div class="card-body">
+
+            @if (Model.ReportsTable.Rows.Count == 0)
+            {
+                <p class="text-muted">No pending or in-progress cleaning requests with complaints found.</p>
+            }
+            else
+            {
+                <!-- Update Report Status Form -->
+                <form method="post" asp-page-handler="UpdateReportStatus" class="row align-items-end mb-4">
+                    <div class="col-md-5">
+                        <label asp-for="SelectedReport" class="form-label">Select Report</label>
+                        <select asp-for="SelectedReport" class="form-select" required>
+                            <option value="">Select a Report</option>
+                            @foreach (System.Data.DataRow row in Model.ReportsTable.Rows)
+                            {
+                                <option value="@row["ID"]">@row["RoomID"] - @row["Complaint"]</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="SelectedCondition" class="form-label">Condition</label>
+                        <select asp-for="SelectedCondition" class="form-select" required>
+                            <option value="In progress">In Progress</option>
+                            <option value="Handled">Done</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2 d-grid">
+                        <button type="submit" class="btn btn-success mt-3 mt-md-0">Update</button>
+                    </div>
+                </form>
+
+                <!-- Reports Table -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Request ID</th>
+                                <th>Room ID</th>
+                                <th>Complaint</th>
+                                <th>Requestor Name</th>
+                                <th>Request Date</th>
+                                <th>Request Time</th>
+                                <th>Condition</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (System.Data.DataRow row in Model.ReportsTable.Rows)
+                            {
+                                <tr>
+                                    <td>@row["ID"]</td>
+                                    <td>@row["RoomID"]</td>
+                                    <td>@row["Complaint"]</td>
+                                    <td>@row["RequestorName"]</td>
+                                    <td>@Convert.ToDateTime(row["RequestDate"]).ToShortDateString()</td>
+                                    <td>@row["RequestTime"]</td>
+                                    <td>@row["Condition"]</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

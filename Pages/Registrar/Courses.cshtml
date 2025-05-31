@@ -1,0 +1,72 @@
+﻿@page
+@model Project.Pages.Registrar.CoursesModel
+@{
+    ViewData["Title"] = "Courses";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Courses</h1>
+        <a asp-page="/Registrar/AddCourse" class="btn btn-primary" style="background-color:#2c3e50;">
+            <i class="fas fa-plus me-2"></i>Add New Course
+        </a>
+    </div>
+
+    <div class="row">
+        @foreach (System.Data.DataRow row in Model.DT.Rows)
+        {
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Course Name:</label>
+                            <div class="form-value">@row["Name"]</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Professor:</label>
+                            <div class="form-value">
+                                @(row["professor_name"] == DBNull.Value ? "Not assigned" : row["professor_name"])
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">TA:</label>
+                            <div class="form-value">
+                                @(row["ta_name"] == DBNull.Value ? "Not assigned" : row["ta_name"])
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">JTA:</label>
+                            <div class="form-value">
+                                @(row["jta_name"] == DBNull.Value ? "Not assigned" : row["jta_name"])
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Number of Students:</label>
+                            <div class="form-value">@row["Student_Count"]</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+<style>
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-label {
+        color: #2c3e50;
+    }
+
+    .form-value {
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        padding: 0.375rem 0.75rem;
+        background-color: #ffffff;
+        color: #212529;
+    }
+</style>

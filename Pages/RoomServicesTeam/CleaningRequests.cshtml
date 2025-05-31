@@ -1,0 +1,70 @@
+﻿@page
+@model Project.Pages.RoomServicesTeam.Cleaning_RequestModel
+@{
+    ViewData["Title"] = "Submit Cleaning Request";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h4 class="mb-0">Submit a Cleaning Request</h4>
+        </div>
+        <div class="card-body">
+            <!-- Request Form -->
+            <form method="post" asp-page-handler="SubmitCleaningRequest" class="row align-items-end mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Select Room</label>
+                    <select asp-for="SelectedRoomId" class="form-select" required>
+                        <option value="">-- Select Room --</option>
+                        @foreach (var room in Model.RoomsList)
+                        {
+                            <option value="@room">@room</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button type="submit" class="btn btn-primary mt-3 mt-md-0">Request</button>
+                </div>
+            </form>
+
+            <!-- Request Table -->
+            <h5 class="mb-3">Cleaning Requests</h5>
+
+            @if (Model.CleaningRequestsTable.Rows.Count == 0)
+            {
+                <p class="text-muted">No cleaning requests found.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Request ID</th>
+                                <th>Room ID</th>
+                                <th>Condition</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Requested By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (System.Data.DataRow row in Model.CleaningRequestsTable.Rows)
+                            {
+                                <tr>
+                                    <td>@row["RID"]</td>
+                                    <td>@row["RoomID"]</td>
+                                    <td>@row["Condition"]</td>
+                                    <td>@Convert.ToDateTime(row["RequestDate"]).ToShortDateString()</td>
+                                    <td>@row["RequestTime"]</td>
+                                    <td>@row["RequestorName"]</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,78 @@
+﻿@page
+@model Project.Pages.CleaningStaff.CleaningRequestsModel
+@{
+    ViewData["Title"] = "Cleaning Requests";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h4 class="mb-0">@ViewData["Title"]</h4>
+        </div>
+        <div class="card-body">
+            @if (Model.CleaningRequestsTable.Rows.Count == 0)
+            {
+                <p class="text-muted">No pending or in-progress cleaning requests found.</p>
+            }
+            else
+            {
+                <form method="post" asp-page-handler="UpdateRequestStatus">
+                    <div class="row align-items-end mb-4">
+                        <div class="col-md-4">
+                            <label asp-for="SelectedRequestId" class="form-label">Select Request</label>
+                            <select asp-for="SelectedRequestId" class="form-select" required>
+                                <option value="">Select a Request</option>
+                                @foreach (System.Data.DataRow row in Model.CleaningRequestsTable.Rows)
+                                {
+                                    <option value="@row["ID"]">@row["RoomID"] - @row["RequestorName"]</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="SelectedStatus" class="form-label">Condition</label>
+                            <select asp-for="SelectedStatus" class="form-select" required>
+                                <option value="In progress">In Progress</option>
+                                <option value="Handled">Handled</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 d-grid">
+                            <button type="submit" class="btn btn-success mt-3 mt-md-0">Update</button>
+                        </div>
+                    </div>
+                </form>
+
+                <h5 class="mt-4">Requests Table</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Request ID</th>
+                                <th>Room ID</th>
+                                <th>Requestor</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Condition</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (System.Data.DataRow row in Model.CleaningRequestsTable.Rows)
+                            {
+                                <tr>
+                                    <td>@row["ID"]</td>
+                                    <td>@row["RoomID"]</td>
+                                    <td>@row["RequestorName"]</td>
+                                    <td>@Convert.ToDateTime(row["RequestDate"]).ToShortDateString()</td>
+                                    <td>@row["RequestTime"]</td>
+                                    <td>@row["Condition"]</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
